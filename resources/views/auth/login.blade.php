@@ -4,25 +4,46 @@
     <main class="content">
         <br>
         <h2 class="relogin fw-bold">Halaman Login</h2>
-        <form class="row g-2 mt-2" id="LoginForm" method="POST" action="">
+        <form class="row g-2 mt-2" id="LoginForm" action="{{ route('login') }}" method="POST">
+            @csrf
             <section class="col-md-5">
                 <div class="row">
                     <article class="col-md-12">
                         <div class="col-md-12 form-register">
                             <label for="name" class="form-label">Nama</label>
                             <input type="text" class="form-control" id="name" name="name" />
+                            @if ($errors->has('name'))
+                                <div class="text-danger">
+                                    {{ $errors->first('name') }}
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-12 form-register">
                             <label for="noUser" class="form-label">NIM/NIP/NIK</label>
                             <input type="text" class="form-control" id="noUser" name="noUser" />
+                            @if ($errors->has('noUser'))
+                                <div class="text-danger">
+                                    {{ $errors->first('noUser') }}
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-12 form-register">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" />
+                            @if ($errors->has('email'))
+                                <div class="text-danger">
+                                    {{ $errors->first('email') }}
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-12 form-register">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" />
+                            @if ($errors->has('password'))
+                                <div class="text-danger">
+                                    {{ $errors->first('password') }}
+                                </div>
+                            @endif
                         </div>
                     </article>
                 </div>
