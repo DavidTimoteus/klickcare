@@ -44,7 +44,7 @@
                         @else
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('login') ? 'active' : '' }}"
-                                    href="{{ url('/') }}">LOGIN</a>
+                                    href="{{ route('login') }}">LOGIN</a>
                             </li>
                         @endauth
                     </ul>
