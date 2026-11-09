@@ -1,395 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <link rel="icon" href="{{ asset('/images/logo.png') }}" type="image/x-icon" id="favicon_link">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="{{ asset('img/klickCare-logo.png') }}" type="image/x-icon">
+    <title>Konsol Medis Admin - KlickCare Polinema</title>
 
-    <title>KlickCare | Admin</title>
-
-    {{-- Custom fonts for this template --}}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"
-        type="text/css" />
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet" />
-
-    <!-- Custom styles for this template-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    @vite('resources/js/app.js')
-    @vite('resources/css/sb-admin-2.css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @vite(['resources/css/app.css', 'resources/css/navfot.css', 'resources/js/app.js'])
 </head>
+<body style="background-color: #f1f5f9;">
+    @include('components.navbar')
 
-<body id="page-top">
-    <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-hospital"></i>
+    <div class="container-fluid px-lg-4 py-4">
+        {{-- Flash Messages --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $errors->first() }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        {{-- Admin Console Header --}}
+        <div class="bg-white border rounded-4 p-4 mb-4 shadow-sm">
+            <div class="row align-items-center justify-content-between g-3">
+                <div class="col-md-7">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle mb-2">Konsol Tenaga Medis & Administrator</span>
+                    <h2 class="fw-bold mb-1">Manajemen Operasional Poliklinik</h2>
+                    <p class="text-secondary small mb-0">
+                        Kelola antrian pasien, panggil nomor antrian ke ruang periksa, serta catat diagnosis dan resep obat secara terintegrasi.
+                    </p>
                 </div>
-                <div class="sidebar-brand-text mx-3">E-Poli Admin</div>
-            </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0" />
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider" />
-
-            <!-- Heading -->
-            <div class="sidebar-heading">Data Pengguna</div>
-
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>List Pasien</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-fw fa-user-nurse"></i>
-                    <span>List Dokter</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider" />
-
-            <!-- Heading -->
-            <div class="sidebar-heading">Medical Data</div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                    aria-expanded="true" aria-controls="collapsePages">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Rekaman Medis</span>
-                </a>
-                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">List Data Medis:</h6>
-                        <a class="collapse-item" href="#">Antrian</a>
-                        <a class="collapse-item" href="#">Riwayat</a>
-                        <a class="collapse-item" href="#">Rujukan</a>
+                <div class="col-md-4 text-md-end">
+                    <div class="badge bg-light text-dark border p-2 text-start">
+                        <small class="text-muted d-block">Tanggal Pelayanan:</small>
+                        <span class="fw-bold"><i class="bi bi-calendar-check text-primary me-1"></i> {{ now()->translatedFormat('l, d F Y') }}</span>
                     </div>
                 </div>
-            </li>
-
-            <!-- Nav Item - Home -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('') }}">
-                    <i class="fas fa-fw fa-home"></i>
-                    <span>Home</span></a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block" />
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-        </ul>
-        <!-- End of Sidebar -->
+        </div>
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
-            <div id="content">
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
+        {{-- 4 Clinical KPI Metrics Cards --}}
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="kc-metric-card border-warning">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="kc-metric-label text-warning-emphasis">Antrian Menunggu</span>
+                        <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                    </div>
+                    <div class="kc-metric-value text-warning-emphasis">{{ $waitingCount }}</div>
+                    <small class="text-muted">Pasien di ruang tunggu</small>
+                </div>
+            </div>
 
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small"
-                                placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
+            <div class="col-sm-6 col-xl-3">
+                <div class="kc-metric-card border-primary">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="kc-metric-label text-primary">Sedang Diperiksa</span>
+                        <i class="bi bi-stethoscope text-primary fs-3"></i>
+                    </div>
+                    <div class="kc-metric-value text-primary">{{ $inProgressCount }}</div>
+                    <small class="text-muted">Pasien di ruang dokter</small>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="kc-metric-card border-success">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="kc-metric-label text-success">Pemeriksaan Selesai</span>
+                        <i class="bi bi-check2-circle text-success fs-3"></i>
+                    </div>
+                    <div class="kc-metric-value text-success">{{ $completedCount }}</div>
+                    <small class="text-muted">Selesai diperiksa hari ini</small>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="kc-metric-card border-secondary">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="kc-metric-label text-dark">Total Pasien Terdaftar</span>
+                        <i class="bi bi-people text-secondary fs-3"></i>
+                    </div>
+                    <div class="kc-metric-value text-dark">{{ $totalPatientsCount }}</div>
+                    <small class="text-muted">Sivitas akademika aktif</small>
+                </div>
+            </div>
+        </div>
+
+        {{-- Main Queue Table & Operation Console --}}
+        <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom pb-3 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Daftar Antrian Kunjungan Pasien Hari Ini</h5>
+                    <p class="text-muted small mb-0">Klik tombol tindakan untuk memanggil pasien atau menyelesaikan pemeriksaan.</p>
+                </div>
+
+                {{-- Filter Poli --}}
+                <form action="{{ route('admin') }}" method="GET" class="d-flex align-items-center gap-2">
+                    <select name="poli_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">-- Semua Poliklinik --</option>
+                        @foreach ($polies as $p)
+                            <option value="{{ $p->id }}" {{ $selectedPoliId == $p->id ? 'selected' : '' }}>
+                                {{ $p->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if ($selectedPoliId)
+                        <a href="{{ route('admin') }}" class="btn btn-outline-secondary btn-sm" title="Reset filter">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="small text-muted">Kode</th>
+                            <th class="small text-muted">Pasien</th>
+                            <th class="small text-muted">NIM / NIP</th>
+                            <th class="small text-muted">Poli Tujuan</th>
+                            <th class="small text-muted">Keluhan Pasien</th>
+                            <th class="small text-muted">Status</th>
+                            <th class="small text-muted">Catatan Dokter</th>
+                            <th class="small text-muted text-center" style="min-width: 180px;">Tindakan Medis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($todayQueues as $q)
+                            <tr class="{{ $q->status === 'in_progress' ? 'table-primary' : '' }}">
+                                <td class="mono-num fw-bold fs-6 text-primary">
+                                    {{ $q->queue_code }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ $q->user->name }}</div>
+                                    <small class="badge bg-light text-secondary border">{{ $q->user->role_label }}</small>
+                                </td>
+                                <td class="mono-num small">{{ $q->user->noId }}</td>
+                                <td>
+                                    <div class="fw-semibold">{{ $q->poli->name }}</div>
+                                    <small class="text-muted">{{ $q->poli->room }}</small>
+                                </td>
+                                <td class="small text-secondary" style="max-width: 220px;">
+                                    {{ $q->complaint }}
+                                </td>
+                                <td>
+                                    <span class="badge {{ $q->status_badge_class }}">
+                                        {{ $q->status_label }}
+                                    </span>
+                                </td>
+                                <td class="small text-muted" style="max-width: 200px;">
+                                    {{ $q->doctor_notes ?? '-' }}
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        @if ($q->status === 'waiting')
+                                            {{-- Tombol Panggil --}}
+                                            <form action="{{ route('admin.queue.status', $q->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status" value="in_progress">
+                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold" title="Panggil ke Ruang Periksa">
+                                                    <i class="bi bi-megaphone me-1"></i> Panggil
+                                                </button>
+                                            </form>
+                                        @elseif ($q->status === 'in_progress')
+                                            {{-- Tombol Selesaikan dengan Catatan --}}
+                                            <button type="button" class="btn btn-success btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#completeModal{{ $q->id }}">
+                                                <i class="bi bi-check2-circle me-1"></i> Selesaikan
+                                            </button>
+                                        @endif
+
+                                        @if ($q->status !== 'completed' && $q->status !== 'cancelled')
+                                            <form action="{{ route('admin.queue.status', $q->id) }}" method="POST" onsubmit="return confirm('Batalkan antrian ini?')">
+                                                @csrf
+                                                <input type="hidden" name="status" value="cancelled">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Batalkan Antrian">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+
+                                    {{-- Modal Catat Rekam Medis / Resep --}}
+                                    @if ($q->status === 'in_progress')
+                                        <div class="modal fade" id="completeModal{{ $q->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $q->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('admin.queue.status', $q->id) }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="status" value="completed">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title fw-bold" id="modalLabel{{ $q->id }}">
+                                                                Selesaikan Pemeriksaan {{ $q->queue_code }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-start">
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold">Nama Pasien:</label>
+                                                                <input type="text" class="form-control" value="{{ $q->user->name }} ({{ $q->user->noId }})" readonly disabled>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold">Keluhan Pasien:</label>
+                                                                <p class="small text-muted p-2 bg-light border rounded">{{ $q->complaint }}</p>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="doctor_notes_{{ $q->id }}" class="form-label small fw-bold">Diagnosis Medis & Resep Obat:</label>
+                                                                <textarea class="form-control" id="doctor_notes_{{ $q->id }}" name="doctor_notes" rows="3" 
+                                                                          placeholder="Tuliskan hasil diagnosis, tindakan medis, atau resep obat yang diberikan..." required></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                                            <button type="submit" class="btn btn-success btn-sm fw-bold">Simpan & Selesaikan</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted small">
+                                    <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
+                                    Tidak ada antrian pasien pada poliklinik yang dipilih untuk hari ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Master Data Poliklinik & Dokter --}}
+        <div class="bg-white border rounded-4 shadow-sm p-4">
+            <h5 class="fw-bold mb-3">Status 4 Poliklinik Hari Ini</h5>
+            <div class="row g-3">
+                @foreach ($polies as $p)
+                    <div class="col-md-6 col-lg-3">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <img src="{{ asset($p->icon_path) }}" alt="{{ $p->name }}" height="28" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                <h6 class="fw-bold mb-0">{{ $p->name }}</h6>
+                            </div>
+                            <div class="small text-muted mb-1"><i class="bi bi-person-fill text-primary me-1"></i> {{ $p->doctor_name }}</div>
+                            <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i> {{ $p->open_time }} - {{ $p->close_time }} WIB</div>
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2 small">
+                                <span>Sisa Kuota:</span>
+                                <span class="mono-num fw-bold text-primary">{{ $p->remainingQuotaToday() }} / {{ $p->daily_quota }}</span>
                             </div>
                         </div>
-                    </form>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2" />
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">Alerts Center</h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to
-                                            download!</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for
-                                        your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All
-                                    Alerts</a>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Messages -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-                                <!-- Counter - Messages -->
-                                <span class="badge badge-danger badge-counter">7</span>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">Message Center</h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="..." />
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        <div class="text-truncate">
-                                            Hi there! I am wondering if you can help me with a
-                                            problem I've been having.
-                                        </div>
-                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="..." />
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            I have the photos that you ordered last month, how would
-                                            you like them sent to you?
-                                        </div>
-                                        <div class="small text-gray-500">Jae Chun · 1d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="..." />
-                                        <div class="status-indicator bg-warning"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            Last month's report looks great, I am very happy with
-                                            the progress so far, keep up the good work!
-                                        </div>
-                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle"
-                                            src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="..." />
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            Am I a good boy? The reason I ask is because someone
-                                            told me that people say this to all dogs, even if they
-                                            aren't good...
-                                        </div>
-                                        <div class="small text-gray-500">
-                                            Chicken the Dog · 2w
-                                        </div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More
-                                    Messages</a>
-                            </div>
-                        </li>
-
-                        <div class="topbar-divider d-none d-sm-block"></div>
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span
-                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
-                                <img class="img-profile rounded-circle" src="{{ asset('/images/logo.png') }}" />
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                    style="display: none;">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <!-- Page Heading -->
-                <div class="container-fluid">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate
-                            Report</a>
                     </div>
-                </div>
-                <!-- /.container-fluid -->
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; KlickCare</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
-        </div>
-        <!-- End of Content Wrapper -->
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Select "Logout" below if you are ready to end your current session.
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">
-                        Cancel
-                    </button>
-                    <a class="btn btn-primary" href="#">Logout</a>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
 
-    {{-- Bootstrap core JavaScript --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

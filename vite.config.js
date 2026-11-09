@@ -6,8 +6,9 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/auth.css',
+                'resources/css/navfot.css',
                 'resources/js/app.js',
-                'resources/css/auth.css'
             ],
             refresh: true,
         }),

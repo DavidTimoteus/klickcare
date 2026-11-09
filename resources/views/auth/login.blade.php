@@ -1,84 +1,91 @@
 @extends('auth.index')
-@section('login')
-    <!--Form Login-->
-    <main class="content">
-        <br>
-        <h2 class="relogin fw-bold">Halaman Login</h2>
-        <form class="row g-2 mt-2" id="LoginForm" action="{{ route('login') }}" method="POST">
+
+@section('title', 'Masuk - KlickCare Polinema')
+
+@section('content')
+<div class="kc-auth-wrapper">
+    <div class="kc-auth-card">
+        <div class="text-center mb-4">
+            <img src="{{ asset('img/klickCare-logo.png') }}" alt="KlickCare" height="48" class="mb-2">
+            <h2 class="kc-auth-title">Masuk ke KlickCare</h2>
+            <p class="kc-auth-subtitle">Gunakan Email Kampus atau NIM / NIP Polinema</p>
+        </div>
+
+        @if ($errors->any())
+            <div class="alert alert-danger py-2 px-3 rounded-3 small mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form action="{{ route('login.post') }}" method="POST">
             @csrf
-            <section class="col-md-5">
-                <div class="row">
-                    <article class="col-md-12">
-                        <div class="col-md-12 form-register">
-                            <label for="name" class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="name" name="name" />
-                            @if ($errors->has('name'))
-                                <div class="text-danger">
-                                    {{ $errors->first('name') }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-12 form-register">
-                            <label for="noUser" class="form-label">NIM/NIP/NIK</label>
-                            <input type="text" class="form-control" id="noUser" name="noUser" />
-                            @if ($errors->has('noUser'))
-                                <div class="text-danger">
-                                    {{ $errors->first('noUser') }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-12 form-register">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" />
-                            @if ($errors->has('email'))
-                                <div class="text-danger">
-                                    {{ $errors->first('email') }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-12 form-register">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" />
-                            @if ($errors->has('password'))
-                                <div class="text-danger">
-                                    {{ $errors->first('password') }}
-                                </div>
-                            @endif
-                        </div>
-                    </article>
-                </div>
-                <div class="row g-2">
-                    <div class="col-4">
-                        <button type="submit" name="login" class="btn btn-primary btn-login"
-                            style="margin: 20px 0px 20px 0px;">Login</button>
-                    </div>
-                    <div class="col-6" style="margin: 20px 0px 20px 0px;">
-                        <p style="margin-bottom: 5px;">Belum punya akun?</p>
-                        <a class="btn btn-danger Register-Link" href="">Registrasi</a>
-                    </div>
-                    <div class="row">
-                        <div class="col-12" style="padding-left: 0;">
-                            <input type="radio" class="btn-check" name="status" value="3" id="mahasiswa"
-                                autocomplete="off" checked />
-                            <label class="btn btn-primary btn-status" for="mahasiswa">Mahasiswa</label>
 
-                            <input type="radio" class="btn-check" name="status" value="2" id="dosen"
-                                autocomplete="off" />
-                            <label class="btn btn-primary btn-status" for="dosen">Dosen/Pegawai</label>
+            <div class="kc-form-group">
+                <label for="login" class="kc-form-label">Email Kampus / NIM / NIP</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0 @error('login') is-invalid @enderror" 
+                           id="login" name="login" value="{{ old('login') }}" 
+                           placeholder="contoh: 2131710012 atau admin@admin.polinema.ac.id" required autofocus>
+                </div>
+            </div>
 
-                            <input type="radio" class="btn-check" name="status" value="1" id="admin"
-                                autocomplete="off" />
-                            <label class="btn btn-primary btn-status" for="admin">Admin</label>
-                        </div>
-                    </div>
+            <div class="kc-form-group">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="password" class="kc-form-label mb-0">Kata Sandi</label>
                 </div>
-            </section>
-            <aside class="col-md-7">
-                <div>
-                    <img src="{{ asset('img/side-login.png') }}" height="420px" alt="Side Login Image" />
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control border-start-0 ps-0 @error('password') is-invalid @enderror" 
+                           id="password" name="password" placeholder="Masukkan kata sandi" required>
                 </div>
-            </aside>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                    <label class="form-check-label small text-secondary" for="remember">
+                        Ingat Saya
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-kc-primary w-100 py-2 fw-bold shadow-sm">
+                Masuk Sekarang
+            </button>
+
+            <div class="text-center mt-3 small">
+                <span class="text-muted">Belum memiliki akun?</span>
+                <a href="{{ route('register') }}" class="fw-bold text-primary text-decoration-none ms-1">Daftar Akun Pasien</a>
+            </div>
         </form>
-    </main>
-    <!--End Form Login-->
+
+        {{-- Demo Accounts Quick-Fill Helper for Testing & Evaluation --}}
+        <div class="kc-demo-accounts">
+            <div class="fw-bold text-dark mb-1 d-flex align-items-center gap-1">
+                <i class="bi bi-key-fill text-warning"></i>
+                <span>Akses Akun Demo Cepat (Klik untuk isi otomatis):</span>
+            </div>
+            <button type="button" class="kc-demo-btn" onclick="fillCredentials('admin@admin.polinema.ac.id', 'password123')">
+                <strong>Admin Medis:</strong> admin@admin.polinema.ac.id (Pass: password123)
+            </button>
+            <button type="button" class="kc-demo-btn" onclick="fillCredentials('2131710012@student.polinema.ac.id', 'password123')">
+                <strong>Mahasiswa:</strong> 2131710012 (Pass: password123)
+            </button>
+            <button type="button" class="kc-demo-btn" onclick="fillCredentials('dosen@polinema.ac.id', 'password123')">
+                <strong>Dosen / Staff:</strong> dosen@polinema.ac.id (Pass: password123)
+            </button>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    function fillCredentials(identifier, password) {
+        document.getElementById('login').value = identifier;
+        document.getElementById('password').value = password;
+    }
+</script>
+@endpush
