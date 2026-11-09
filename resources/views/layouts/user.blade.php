@@ -14,21 +14,9 @@
 </head>
 <body style="background-color: #f8fafc;">
     @include('components.navbar')
+    @include('components.toast')
 
     <div class="container py-4">
-        {{-- Flash Messages --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $errors->first() }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
 
         {{-- Patient Header Banner with Rich Visual Styling --}}
         <div class="bg-white border rounded-4 p-4 mb-4 shadow-sm position-relative overflow-hidden">

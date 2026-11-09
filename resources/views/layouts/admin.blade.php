@@ -13,21 +13,9 @@
 </head>
 <body style="background-color: #f1f5f9;">
     @include('components.navbar')
+    @include('components.toast')
 
     <div class="container-fluid px-lg-4 py-4">
-        {{-- Flash Messages --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $errors->first() }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
 
         {{-- Admin Console Header --}}
         <div class="bg-white border rounded-4 p-4 mb-4 shadow-sm">

@@ -17,24 +17,7 @@
 </head>
 <body>
     @include('components.navbar')
-
-    {{-- Flash Notifications --}}
-    @if (session('success'))
-        <div class="container mt-3">
-            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    @endif
-    @if (session('info'))
-        <div class="container mt-3">
-            <div class="alert alert-info alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-                <i class="bi bi-info-circle-fill me-2"></i> {{ session('info') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    @endif
+    @include('components.toast')
 
     {{-- Hero Section with Rich Visual Presentation --}}
     <section class="kc-hero-section">

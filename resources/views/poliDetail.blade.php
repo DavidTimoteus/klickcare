@@ -14,6 +14,7 @@
 </head>
 <body>
     @include('components.navbar')
+    @include('components.toast')
 
     <div class="container py-5">
         <div class="mb-4">

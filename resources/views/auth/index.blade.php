@@ -14,6 +14,7 @@
 </head>
 <body style="background-color: #f8fafc;">
     @include('components.navbar')
+    @include('components.toast')
 
     <main>
         @yield('content')
