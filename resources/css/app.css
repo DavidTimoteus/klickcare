@@ -141,74 +141,81 @@ h1, h2, h3, h4, h5, h6, .display-font {
     max-width: 580px;
 }
 
-/* Hero Visual Showcase */
-.kc-hero-visual-wrapper {
+/* Hero Visual Showcase (Full Uncropped Clinical Photo) */
+.kc-hero-visual-stage {
     position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 100%;
 }
 
-.kc-hero-visual-frame {
-    background: #ffffff;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 24px;
-    padding: 1.5rem;
-    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.05);
+.kc-hero-glow {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 105%;
+    height: 105%;
+    background: radial-gradient(circle at center, rgba(37, 99, 235, 0.14) 0%, rgba(219, 234, 254, 0.45) 45%, transparent 72%);
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.kc-hero-photo-wrapper {
     position: relative;
-    overflow: hidden;
+    z-index: 2;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.kc-hero-photo {
+    width: auto;
+    max-width: 100%;
+    max-height: 480px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 30px rgba(15, 23, 42, 0.15));
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.kc-hero-visual-frame:hover {
-    transform: translateY(-4px);
+.kc-hero-photo:hover {
+    transform: scale(1.02);
 }
 
-.kc-hero-img {
-    width: 100%;
-    height: auto;
-    border-radius: 16px;
-    object-fit: cover;
-    max-height: 380px;
-    background-color: #f1f5f9;
-}
-
-/* Floating Badges with Subtle Animation */
-.kc-floating-badge {
-    position: absolute;
+.kc-hero-grounded-bar {
+    position: relative;
+    z-index: 3;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 12px;
-    padding: 0.65rem 1rem;
-    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+    border-radius: 14px;
+    padding: 0.75rem 1.15rem;
+    box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    font-size: 0.825rem;
-    font-weight: 700;
-    color: #1e293b;
-    z-index: 2;
-    animation: floatBadge 4s ease-in-out infinite;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 480px;
+    margin-top: 1.25rem;
 }
 
-.kc-floating-badge-top {
-    top: -15px;
-    left: -15px;
-}
-
-.kc-floating-badge-bottom {
-    bottom: -15px;
-    right: -15px;
-    animation-delay: 2s;
-}
-
-@keyframes floatBadge {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-6px);
-    }
+.kc-hero-bar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
 }
 
 /* Quick Metrics Widget */
@@ -217,6 +224,11 @@ h1, h2, h3, h4, h5, h6, .display-font {
     border: 1px solid var(--kc-border);
     border-radius: 14px;
     padding: 1.35rem 1.5rem;
+    height: 100%;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-shadow: var(--kc-shadow-card);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -243,21 +255,50 @@ h1, h2, h3, h4, h5, h6, .display-font {
     letter-spacing: 0.05em;
 }
 
+/* Clinical Filter Tabs */
+.kc-filter-pill {
+    background: #ffffff;
+    color: var(--kc-ink-secondary);
+    border: 1px solid var(--kc-border);
+    border-radius: 9999px;
+    padding: 0.45rem 1.15rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    display: inline-flex;
+    align-items: center;
+}
+
+.kc-filter-pill:hover {
+    background: #f8fafc;
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+}
+
+.kc-filter-pill.active {
+    background: #1d4ed8;
+    color: #ffffff;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+}
+
 /* ---------------------------------------------------
-   Clinical Poli Cards with Interactive Depth
+   Clinical Poli Cards with Strict Structural Symmetry
 ----------------------------------------------------- */
 
 .kc-poli-card {
     background: var(--kc-bg-surface);
     border: 1px solid var(--kc-border);
     border-radius: 16px;
-    padding: 1.75rem;
+    padding: 1.5rem;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-shadow: var(--kc-shadow-card);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
     text-decoration: none;
     color: inherit;
     position: relative;
@@ -287,16 +328,22 @@ h1, h2, h3, h4, h5, h6, .display-font {
     opacity: 1;
 }
 
+.kc-poli-card-top {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
 .kc-poli-header {
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
 }
 
 .kc-poli-icon-wrapper {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     border-radius: 14px;
     background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     border: 1px solid #bfdbfe;
@@ -312,19 +359,54 @@ h1, h2, h3, h4, h5, h6, .display-font {
 }
 
 .kc-poli-icon-wrapper img {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
+}
+
+.kc-poli-header-info {
+    min-width: 0;
+}
+
+.kc-poli-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--kc-ink-primary);
+    line-height: 1.25;
+}
+
+.kc-poli-desc {
+    font-size: 0.825rem;
+    line-height: 1.48;
+    color: var(--kc-ink-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.65rem;
+    max-height: 3.65rem;
+    margin-bottom: 1rem;
+}
+
+.kc-poli-card-bottom {
+    flex-shrink: 0;
 }
 
 .kc-poli-meta {
     background-color: #f8fafc;
     border: 1px solid #f1f5f9;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 0.85rem 1rem;
-    font-size: 0.85rem;
+    font-size: 0.825rem;
     color: var(--kc-ink-secondary);
-    margin-top: 1.25rem;
+}
+
+.kc-poli-doc-row {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ---------------------------------------------------

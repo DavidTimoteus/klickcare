@@ -68,43 +68,46 @@
                     </div>
                 </div>
 
-                {{-- Hero Visual with Real Medical Imagery & Floating Badges --}}
+                {{-- Hero Visual with Real Medical Imagery & Grounded Clinical Badge --}}
                 <div class="col-lg-6">
-                    <div class="kc-hero-visual-wrapper position-relative text-center">
-                        {{-- Floating Badges --}}
-                        <div class="kc-floating-badge kc-floating-badge-top">
-                            <i class="bi bi-patch-check-fill text-primary fs-5"></i>
-                            <div class="text-start">
-                                <span class="d-block text-dark fw-bold">Fasilitas Resmi</span>
-                                <small class="text-muted" style="font-size: 0.725rem;">Kampus Polinema Malang</small>
-                            </div>
+                    <div class="kc-hero-visual-stage position-relative text-center">
+                        {{-- Ambient Clinical Soft Glow Halo --}}
+                        <div class="kc-hero-glow"></div>
+
+                        {{-- Medical Photography: 100% Full & Uncropped --}}
+                        <div class="kc-hero-photo-wrapper">
+                            <img src="{{ asset('img/beranda.png') }}" class="kc-hero-photo" alt="Tim Medis Poliklinik Polinema">
                         </div>
 
-                        <div class="kc-floating-badge kc-floating-badge-bottom">
-                            <i class="bi bi-heart-pulse-fill text-danger fs-5"></i>
-                            <div class="text-start">
-                                <span class="d-block text-dark fw-bold">4 Poli Spesialis</span>
-                                <small class="text-muted" style="font-size: 0.725rem;">Layanan Medis Lengkap</small>
+                        {{-- Clean Grounded Facility Badge --}}
+                        <div class="kc-hero-grounded-bar">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="kc-hero-bar-icon">
+                                    <i class="bi bi-shield-check text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <strong class="d-block text-dark fw-bold" style="font-size: 0.85rem;">Fasilitas Medis Resmi Kampus</strong>
+                                    <span class="text-secondary" style="font-size: 0.75rem;">Tim Dokter Umum, Spesialis Gigi, Mata & Nutrisionis</span>
+                                </div>
                             </div>
-                        </div>
-
-                        {{-- Frame Image --}}
-                        <div class="kc-hero-visual-frame">
-                            <img src="{{ asset('img/beranda.png') }}" class="kc-hero-img" alt="Tim Medis Poliklinik Polinema">
+                            <div class="d-none d-sm-flex align-items-center gap-1 text-success fw-bold small">
+                                <span class="kc-pulse-dot"></span>
+                                <span style="font-size: 0.75rem;">Siap Melayani</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Operational Metrics Counter Strip --}}
-            <div class="row g-3 mt-4 pt-3">
+            {{-- Operational Metrics Counter Strip with Animated Count-Up --}}
+            <div class="row g-3 mt-4 pt-3" id="kcMetricsStrip">
                 <div class="col-sm-6 col-lg-3">
                     <div class="kc-metric-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="kc-metric-label">Antrian Menunggu</span>
                             <i class="bi bi-hourglass-split text-warning fs-3"></i>
                         </div>
-                        <div class="kc-metric-value text-warning-emphasis">{{ $waitingToday ?? 0 }}</div>
+                        <div class="kc-metric-value text-warning-emphasis" data-counter-value="{{ $waitingToday ?? 0 }}">{{ $waitingToday ?? 0 }}</div>
                         <small class="text-muted">Pasien dalam antrian</small>
                     </div>
                 </div>
@@ -114,7 +117,7 @@
                             <span class="kc-metric-label">Sedang Diperiksa</span>
                             <i class="bi bi-stethoscope text-primary fs-3"></i>
                         </div>
-                        <div class="kc-metric-value text-primary">{{ $inProgressToday ?? 0 }}</div>
+                        <div class="kc-metric-value text-primary" data-counter-value="{{ $inProgressToday ?? 0 }}">{{ $inProgressToday ?? 0 }}</div>
                         <small class="text-muted">Di ruang dokter jaga</small>
                     </div>
                 </div>
@@ -124,7 +127,7 @@
                             <span class="kc-metric-label">Pasien Selesai</span>
                             <i class="bi bi-check2-circle text-success fs-3"></i>
                         </div>
-                        <div class="kc-metric-value text-success">{{ $completedToday ?? 0 }}</div>
+                        <div class="kc-metric-value text-success" data-counter-value="{{ $completedToday ?? 0 }}">{{ $completedToday ?? 0 }}</div>
                         <small class="text-muted">Pemeriksaan hari ini</small>
                     </div>
                 </div>
@@ -134,7 +137,7 @@
                             <span class="kc-metric-label">Dokter Spesialis</span>
                             <i class="bi bi-hospital text-info fs-3"></i>
                         </div>
-                        <div class="kc-metric-value text-dark">{{ $activeDoctorsCount ?? 4 }}</div>
+                        <div class="kc-metric-value text-dark" data-counter-value="{{ $activeDoctorsCount ?? 4 }}">{{ $activeDoctorsCount ?? 4 }}</div>
                         <small class="text-muted">Siap melayani hari ini</small>
                     </div>
                 </div>
@@ -145,53 +148,67 @@
     {{-- Section 4 Poliklinik --}}
     <section class="py-5" id="layanan-poli">
         <div class="container py-3">
-            <div class="text-center max-w-2xl mx-auto mb-5">
+            <div class="text-center max-w-2xl mx-auto mb-4">
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2 fw-semibold">Unit Pelayanan Medis</span>
                 <h2 class="fw-bold">Layanan 4 Poliklinik Polinema</h2>
                 <p class="text-secondary">Setiap poli didukung oleh tenaga dokter spesialis bersertifikasi serta peralatan klinis lengkap untuk melayani mahasiswa dan staf.</p>
             </div>
 
-            <div class="row g-4">
+            {{-- Interactive Category Filter Tabs --}}
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" id="poliFilterTabs">
+                <button type="button" class="btn btn-sm kc-filter-pill active" data-filter="all">
+                    <i class="bi bi-grid-fill me-1"></i> Semua Poli ({{ $polies->count() }})
+                </button>
+                @foreach ($polies as $p)
+                    <button type="button" class="btn btn-sm kc-filter-pill" data-filter="{{ $p->slug }}">
+                        <img src="{{ asset($p->icon_path) }}" height="15" class="me-1" onerror="this.style.display='none'">
+                        {{ $p->name }}
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="row g-4" id="poliCardsRow">
                 @foreach ($polies as $poli)
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3 poli-card-col" data-poli-slug="{{ $poli->slug }}">
                         <div class="kc-poli-card">
-                            <div>
+                            <div class="kc-poli-card-top">
                                 <div class="kc-poli-header">
                                     <div class="kc-poli-icon-wrapper">
                                         <img src="{{ asset($poli->icon_path) }}" alt="{{ $poli->name }}" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
                                     </div>
-                                    <div>
-                                        <h5 class="fw-bold mb-1">{{ $poli->name }}</h5>
-                                        <div class="badge bg-light text-primary border fw-semibold">
+                                    <div class="kc-poli-header-info">
+                                        <h5 class="kc-poli-title">{{ $poli->name }}</h5>
+                                        <span class="badge bg-light text-primary border fw-semibold">
                                             Kode: {{ $poli->code_prefix }}
-                                        </div>
+                                        </span>
                                     </div>
                                 </div>
 
-                                <p class="text-secondary small mb-3">
-                                    {{ Str::limit($poli->description, 110) }}
+                                <p class="kc-poli-desc" title="{{ $poli->description }}">
+                                    {{ $poli->description }}
                                 </p>
                             </div>
 
-                            <div>
+                            <div class="kc-poli-card-bottom">
                                 <div class="kc-poli-meta">
-                                    <div class="d-flex align-items-center gap-1 mb-1">
-                                        <i class="bi bi-person-badge-fill text-primary"></i>
-                                        <span class="fw-semibold text-dark">{{ $poli->doctor_name }}</span>
+                                    <div class="d-flex align-items-center gap-1 mb-1 kc-poli-doc-row" title="{{ $poli->doctor_name }}">
+                                        <i class="bi bi-person-badge-fill text-primary flex-shrink-0"></i>
+                                        <span class="fw-semibold text-dark text-truncate">{{ $poli->doctor_name }}</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-1 text-secondary mb-1">
-                                        <i class="bi bi-clock-fill text-muted"></i>
+                                        <i class="bi bi-clock-fill text-muted flex-shrink-0"></i>
                                         <span>{{ $poli->open_time }} - {{ $poli->close_time }} WIB</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2">
-                                        <span class="text-secondary">Sisa Kuota:</span>
+                                        <span class="text-secondary small">Sisa Kuota:</span>
                                         <span class="mono-num fw-bold text-success fs-6">{{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}</span>
                                     </div>
                                 </div>
 
                                 <div class="mt-3">
-                                    <a href="{{ route('poli.detail', $poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold rounded-3">
-                                        Lihat Jadwal & Antrian <i class="bi bi-arrow-right ms-1"></i>
+                                    <a href="{{ route('poli.detail', $poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold rounded-3 d-flex align-items-center justify-content-center gap-1">
+                                        <span>Lihat Jadwal & Antrian</span>
+                                        <i class="bi bi-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
