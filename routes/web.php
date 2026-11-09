@@ -22,8 +22,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [LoginController::class, 'register'])->name('register.post');
 });
 
-// Logout (Pengguna Terautentikasi)
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+// Logout (Pengguna Terautentikasi - mendukung POST & GET tanpa kendala 419)
+Route::match(['get', 'post'], '/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Portal Pasien (Mahasiswa [Role 3] & Dosen/Pegawai [Role 2])
 Route::middleware(['auth', 'role:2,3'])->group(function () {

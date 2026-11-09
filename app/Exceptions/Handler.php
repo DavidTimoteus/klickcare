@@ -44,5 +44,19 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+        // Penanganan anggun saat token CSRF kedaluwarsa (Mencegah tampilan 419 Page Expired)
+        $this->renderable(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if ($request->is('logout') || $request->routeIs('logout')) {
+                auth()->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('home')->with('info', 'Anda telah berhasil keluar dari sistem.');
+            }
+
+            return redirect()->route('login')->withErrors([
+                'login' => 'Sesi Anda telah berakhir demi keamanan. Silakan masuk kembali.',
+            ]);
+        });
     }
 }
