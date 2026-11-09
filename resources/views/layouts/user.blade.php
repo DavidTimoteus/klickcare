@@ -84,19 +84,47 @@
                                     <span class="text-end text-dark fw-medium" style="max-width: 60%;">{{ $activeQueue->complaint }}</span>
                                 </div>
                             </div>
+
+                            {{-- Live Queue Position & Status Notice --}}
+                            @if ($activeQueue->status === 'waiting')
+                                <div class="mt-2 p-2 bg-primary-subtle border border-primary-subtle rounded-3 text-center">
+                                    <span class="small text-primary fw-semibold">
+                                        <i class="bi bi-people-fill me-1"></i>
+                                        @if (($waitingAheadCount ?? 0) === 0)
+                                            <strong>Anda antrian berikutnya!</strong> Harap bersiap di ruang tunggu.
+                                        @else
+                                            Ada <strong>{{ $waitingAheadCount }}</strong> pasien di depan Anda (est. ~{{ $waitingAheadCount * 10 }} mnt).
+                                        @endif
+                                    </span>
+                                </div>
+                            @elseif ($activeQueue->status === 'in_progress')
+                                <div class="mt-2 p-2 bg-success-subtle border border-success-subtle rounded-3 text-center">
+                                    <span class="small text-success fw-bold">
+                                        <span class="kc-pulse-dot d-inline-block me-1"></span> Giliran Anda Sekarang! Silakan masuk ke ruang dokter.
+                                    </span>
+                                </div>
+                            @endif
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('poli.detail', $activeQueue->poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
-                                <i class="bi bi-display me-1"></i> Layar Antrian Poli
-                            </a>
+                        {{-- Action Buttons: Pantau Layar Poli & Batalkan Antrian --}}
+                        <div class="row g-2">
+                            <div class="{{ $activeQueue->status === 'waiting' ? 'col-8' : 'col-12' }}">
+                                <a href="{{ route('poli.detail', $activeQueue->poli->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-display"></i>
+                                    <span>Pantau Layar Poli</span>
+                                    <i class="bi bi-box-arrow-up-right small ms-1" style="font-size: 0.725rem;"></i>
+                                </a>
+                            </div>
                             @if ($activeQueue->status === 'waiting')
-                                <form action="{{ route('queue.cancel', $activeQueue->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan antrian ini?')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
-                                        <i class="bi bi-x-circle me-1"></i> Batal
-                                    </button>
-                                </form>
+                                <div class="col-4">
+                                    <form action="{{ route('queue.cancel', $activeQueue->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan antrian ini?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center gap-1">
+                                            <i class="bi bi-x-circle"></i>
+                                            <span>Batal</span>
+                                        </button>
+                                    </form>
+                                </div>
                             @endif
                         </div>
                     @else

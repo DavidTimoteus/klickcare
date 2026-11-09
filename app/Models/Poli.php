@@ -40,6 +40,7 @@ class Poli extends Model
     {
         return $this->queues()
             ->whereDate('visit_date', today())
+            ->where('status', '!=', 'cancelled')
             ->count();
     }
 

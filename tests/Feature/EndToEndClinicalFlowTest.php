@@ -133,5 +133,48 @@ class EndToEndClinicalFlowTest extends TestCase
         $logoutResponse->assertRedirect('/');
         $this->assertGuest();
     }
+
+    public function test_patient_can_cancel_queue_and_quota_is_released(): void
+    {
+        $freshStudent = User::factory()->create([
+            'role' => User::ROLE_STUDENT,
+            'noId' => '2131799999',
+            'email' => 'freshstudent@student.polinema.ac.id',
+        ]);
+        $poli = Poli::where('slug', 'polimata')->firstOrFail();
+
+        $initialRemaining = $poli->remainingQuotaToday();
+
+        $this->actingAs($freshStudent);
+
+        // Pasien daftar antrian
+        $regResponse = $this->post('/antrian/daftar', [
+            'poli_id' => $poli->id,
+            'complaint' => 'Demam dan sakit tenggorokan sejak kemarin malam',
+        ]);
+        $regResponse->assertRedirect('/KlickCare');
+        $this->assertEquals($initialRemaining - 1, $poli->fresh()->remainingQuotaToday());
+
+        // Cek dashboard portal pasien
+        $portalResponse = $this->get('/KlickCare');
+        $portalResponse->assertStatus(200);
+        $portalResponse->assertSee('Tiket Antrian Digital Anda');
+        $portalResponse->assertSee('Pantau Layar Poli');
+        $portalResponse->assertSee('Batal');
+
+        $activeQueue = Queue::where('user_id', $freshStudent->id)
+            ->where('poli_id', $poli->id)
+            ->where('status', 'waiting')
+            ->firstOrFail();
+
+        // Pasien batalkan antrian
+        $cancelResponse = $this->post("/antrian/{$activeQueue->id}/batal");
+        $cancelResponse->assertRedirect();
+        $cancelResponse->assertSessionHas('info');
+
+        // Kuota kembali pulih
+        $this->assertEquals('cancelled', $activeQueue->fresh()->status);
+        $this->assertEquals($initialRemaining, $poli->fresh()->remainingQuotaToday());
+    }
 }
 

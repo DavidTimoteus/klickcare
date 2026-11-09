@@ -72,13 +72,23 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
+        // Hitung jumlah pasien yang sedang menunggu di depan pasien ini
+        $waitingAheadCount = 0;
+        if ($activeQueue && $activeQueue->status === 'waiting') {
+            $waitingAheadCount = Queue::where('poli_id', $activeQueue->poli_id)
+                ->whereDate('visit_date', $todayDate)
+                ->where('status', 'waiting')
+                ->where('queue_number', '<', $activeQueue->queue_number)
+                ->count();
+        }
+
         // Riwayat antrian pasien
         $historyQueues = Queue::with('poli')
             ->where('user_id', $user->id)
             ->latest()
             ->paginate(10);
 
-        return view('layouts.user', compact('user', 'polies', 'activeQueue', 'historyQueues'));
+        return view('layouts.user', compact('user', 'polies', 'activeQueue', 'waitingAheadCount', 'historyQueues'));
     }
 
     /**

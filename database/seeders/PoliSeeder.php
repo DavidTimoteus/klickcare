@@ -57,7 +57,6 @@ class PoliSeeder extends Seeder
             [
                 'name' => 'Poli Gizi',
                 'slug' => 'poligizi',
-                'code_prefix' => 'poligizi',
                 'code_prefix' => 'Z',
                 'doctor_name' => 'Nur Aini, S.Gz., RD',
                 'room' => 'Gedung Graha Polinema Lt. 1 - Ruang 104',
