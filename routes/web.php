@@ -1,23 +1,39 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Route;
 
-// Mengarahkan rute root ke halaman login
-Route::get('/', function () {
-    return view('landingPage');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Web Routes - KlickCare (E-Poliklinik Politeknik Negeri Malang)
+|--------------------------------------------------------------------------
+*/
 
-// Rute untuk halaman login
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// Halaman Publik (Beranda & Informasi Poliklinik)
+Route::get('/', [DashboardController::class, 'landing'])->name('home');
+Route::get('/poli/{slug}', [DashboardController::class, 'poliDetail'])->name('poli.detail');
 
-// Rute untuk admin dan user dashboard dengan middleware auth dan role
-Route::middleware(['auth', 'role:1'])->get('/Admin-Dashboard', function () {
-    return view('layouts.admin');
-})->name('admin');
+// Rute Autentikasi Pengguna (Khusus Tamu / Belum Login)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::get('/register', [LoginController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [LoginController::class, 'register'])->name('register.post');
+});
 
-Route::middleware(['auth', 'role:2'])->get('/KlickCare', function () {
-    return view('layouts.user');
-})->name('user');
+// Logout (Pengguna Terautentikasi)
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Portal Pasien (Mahasiswa [Role 3] & Dosen/Pegawai [Role 2])
+Route::middleware(['auth', 'role:2,3'])->group(function () {
+    Route::get('/KlickCare', [DashboardController::class, 'userDashboard'])->name('user');
+    Route::post('/antrian/daftar', [DashboardController::class, 'storeQueue'])->name('queue.store');
+    Route::post('/antrian/{queue}/batal', [DashboardController::class, 'cancelQueue'])->name('queue.cancel');
+});
+
+// Konsol Admin & Tenaga Medis (Role 1)
+Route::middleware(['auth', 'role:1'])->group(function () {
+    Route::get('/Admin-Dashboard', [DashboardController::class, 'adminDashboard'])->name('admin');
+    Route::post('/admin/antrian/{queue}/status', [DashboardController::class, 'updateQueueStatus'])->name('admin.queue.status');
+});
