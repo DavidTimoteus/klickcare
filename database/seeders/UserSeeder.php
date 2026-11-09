@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class UserSeeder extends Seeder
 {
@@ -14,37 +13,52 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('tbl_users')->insert([
+        // 1. Akun Admin / Tenaga Medis
+        User::updateOrCreate(
+            ['email' => 'admin@admin.polinema.ac.id'],
             [
-                'name' => 'Admin',
+                'name' => 'dr. Dian Pratama (Admin Poliklinik)',
+                'noId' => '198501012010121001',
+                'password' => Hash::make('password123'),
+                'gender' => 'Laki-Laki',
+                'birthDate' => '1985-01-01',
+                'address' => 'Jl. Soekarno Hatta No. 9, Malang',
+                'phoneNumber' => '081234567890',
+                'role' => User::ROLE_ADMIN,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 2. Akun Dosen / Tenaga Kependidikan
+        User::updateOrCreate(
+            ['email' => 'dosen@polinema.ac.id'],
+            [
+                'name' => 'Ir. Bambang Wijaya, M.T.',
+                'noId' => '197505052002121002',
+                'password' => Hash::make('password123'),
+                'gender' => 'Laki-Laki',
+                'birthDate' => '1975-05-05',
+                'address' => 'Perumahan Dosen Polinema Blok B-12, Malang',
+                'phoneNumber' => '081234567891',
+                'role' => User::ROLE_STAFF,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 3. Akun Mahasiswa
+        User::updateOrCreate(
+            ['email' => '2131710012@student.polinema.ac.id'],
+            [
+                'name' => 'David Timoteus',
                 'noId' => '2131710012',
-                'email' => 'admin@admin.polinema.ac.id',
                 'password' => Hash::make('password123'),
                 'gender' => 'Laki-Laki',
                 'birthDate' => '2002-12-17',
-                'address' => 'Jl. Soekarno Hatta No.9',
-                'phoneNumber' => '08123456789',
-                'role' => 1,
-                'create_id' => null,
-                'creation_time' => Carbon::now(),
-                'update_id' => null,
-                'update_time' => Carbon::now(),
-            ],
-            [
-                'name' => 'David',
-                'noId' => '2141762012',
-                'email' => '2131710012@student.polinema.ac.id',
-                'password' => Hash::make('password123'),
-                'gender' => 'Laki-Laki',
-                'birthDate' => '2002-12-17',
-                'address' => 'Jl. Soekarno Hatta No.9',
-                'phoneNumber' => '08123456789',
-                'role' => 2,
-                'create_id' => null,
-                'creation_time' => Carbon::now(),
-                'update_id' => null,
-                'update_time' => Carbon::now(),
-            ],
-        ]);
+                'address' => 'Jl. Kembang Turi No. 15, Lowokwaru, Malang',
+                'phoneNumber' => '085712345678',
+                'role' => User::ROLE_STUDENT,
+                'email_verified_at' => now(),
+            ]
+        );
     }
 }

@@ -13,19 +13,17 @@ return new class extends Migration
     {
         Schema::create('tbl_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
-            $table->string('noId', 30)->unique();
-            $table->string('email', 50)->unique();
+            $table->string('name', 100);
+            $table->string('noId', 30)->unique(); // NIM (Mahasiswa) atau NIP/NIK (Dosen/Pegawai/Admin)
+            $table->string('email', 100)->unique();
             $table->string('password', 255);
-            $table->enum('gender', ['Laki-Laki', 'Perempuan']);
-            $table->date('birthDate');
-            $table->string('address', 100);
-            $table->string('phoneNumber', 255);
-            $table->unsignedBigInteger('role')->default(1);
-            $table->unsignedBigInteger('create_id')->nullable();
-            $table->timestamp('creation_time')->nullable();
-            $table->unsignedBigInteger('update_id')->nullable();
-            $table->timestamp('update_time')->nullable();
+            $table->enum('gender', ['Laki-Laki', 'Perempuan'])->nullable();
+            $table->date('birthDate')->nullable();
+            $table->string('address', 255)->nullable();
+            $table->string('phoneNumber', 30)->nullable();
+            $table->unsignedSmallInteger('role')->default(3); // 1 = Admin/Petugas, 2 = Dosen/Pegawai, 3 = Mahasiswa
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
     }
