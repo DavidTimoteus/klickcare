@@ -26,7 +26,7 @@
                 <div class="col-lg-6">
                     <div class="kc-status-badge">
                         <span class="kc-pulse-dot"></span>
-                        <span>Poliklinik Buka Hari Ini · 08:00 - 15:30 WIB</span>
+                        <span id="kcLiveStatusText">Poliklinik Buka Hari Ini · 08:00 - 15:30 WIB</span>
                     </div>
 
                     <h1 class="kc-hero-title">
