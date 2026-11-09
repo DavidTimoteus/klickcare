@@ -30,21 +30,27 @@
             </div>
         @endif
 
-        {{-- Patient Header Banner --}}
-        <div class="bg-white border rounded-4 p-4 mb-4 shadow-sm">
-            <div class="row align-items-center justify-content-between g-3">
+        {{-- Patient Header Banner with Rich Visual Styling --}}
+        <div class="bg-white border rounded-4 p-4 mb-4 shadow-sm position-relative overflow-hidden">
+            <div class="position-absolute end-0 top-0 bottom-0 opacity-10 d-none d-md-block pe-4 pt-2">
+                <i class="bi bi-hospital fs-1" style="font-size: 8rem !important; color: #1e3a8a;"></i>
+            </div>
+
+            <div class="row align-items-center justify-content-between g-3 position-relative">
                 <div class="col-md-7">
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2">Portal Sivitas Akademika</span>
-                    <h2 class="fw-bold mb-1">Halo, {{ $user->name }}</h2>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2 fw-semibold">
+                        <i class="bi bi-person-circle me-1"></i> Portal Pasien Terpadu
+                    </span>
+                    <h2 class="fw-bold mb-1">Selamat Datang, {{ $user->name }}</h2>
                     <p class="text-secondary small mb-0">
-                        <span class="me-3"><i class="bi bi-card-heading text-primary me-1"></i> NIM/NIP: <strong class="mono-num">{{ $user->noId }}</strong></span>
+                        <span class="me-3"><i class="bi bi-card-heading text-primary me-1"></i> NIM/NIP: <strong class="mono-num text-dark">{{ $user->noId }}</strong></span>
                         <span class="me-3"><i class="bi bi-envelope text-primary me-1"></i> {{ $user->email }}</span>
-                        <span><i class="bi bi-award text-primary me-1"></i> {{ $user->role_label }}</span>
+                        <span><i class="bi bi-award-fill text-warning me-1"></i> {{ $user->role_label }}</span>
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <div class="badge bg-light text-dark border p-2 text-start">
-                        <small class="text-muted d-block">Tanggal Hari Ini:</small>
+                    <div class="badge bg-light text-dark border p-2 text-start shadow-xs">
+                        <small class="text-muted d-block">Tanggal Pelayanan:</small>
                         <span class="fw-bold"><i class="bi bi-calendar-event text-primary me-1"></i> {{ now()->translatedFormat('l, d F Y') }}</span>
                     </div>
                 </div>
@@ -52,49 +58,54 @@
         </div>
 
         <div class="row g-4 mb-4">
-            {{-- Left Column: Active Queue Card --}}
+            {{-- Left Column: Active Queue Card (Ticket Design) --}}
             <div class="col-lg-5">
                 <div class="bg-white border rounded-4 p-4 shadow-sm h-100">
                     <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
-                        <h5 class="fw-bold mb-0">Tiket Antrian Hari Ini</h5>
-                        <i class="bi bi-ticket-detailed text-primary fs-4"></i>
+                        <h5 class="fw-bold mb-0">Tiket Antrian Digital Anda</h5>
+                        <i class="bi bi-qr-code-scan text-primary fs-4"></i>
                     </div>
 
                     @if ($activeQueue)
-                        <div class="text-center py-3 bg-light rounded-4 border mb-3">
-                            <span class="badge {{ $activeQueue->status_badge_class }} text-uppercase mb-2">
+                        <div class="kc-ticket-card text-center mb-3">
+                            <span class="badge {{ $activeQueue->status_badge_class }} text-uppercase px-3 py-1 mb-3">
+                                @if ($activeQueue->status === 'in_progress')
+                                    <span class="kc-pulse-dot d-inline-block me-1"></span>
+                                @endif
                                 {{ $activeQueue->status_label }}
                             </span>
-                            <div class="mono-num fw-bold text-primary" style="font-size: 3.5rem; line-height: 1;">
+
+                            <div class="mono-num fw-bold text-primary mb-2" style="font-size: 3.5rem; line-height: 1; letter-spacing: -0.03em;">
                                 {{ $activeQueue->queue_code }}
                             </div>
-                            <div class="text-dark fw-bold fs-5 mt-2">{{ $activeQueue->poli->name }}</div>
-                            <div class="text-muted small">{{ $activeQueue->poli->room }}</div>
-                        </div>
 
-                        <div class="list-group list-group-flush small border-bottom mb-3">
-                            <div class="list-group-item d-flex justify-content-between px-0">
-                                <span class="text-muted">Dokter Jaga:</span>
-                                <span class="fw-bold">{{ $activeQueue->poli->doctor_name }}</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between px-0">
-                                <span class="text-muted">Jam Layanan:</span>
-                                <span class="fw-semibold">{{ $activeQueue->poli->open_time }} - {{ $activeQueue->poli->close_time }} WIB</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between px-0">
-                                <span class="text-muted">Keluhan:</span>
-                                <span class="text-end text-dark" style="max-width: 60%;">{{ $activeQueue->complaint }}</span>
+                            <div class="text-dark fw-bold fs-5">{{ $activeQueue->poli->name }}</div>
+                            <div class="text-secondary small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $activeQueue->poli->room }}</div>
+
+                            <div class="p-3 bg-light rounded-3 text-start border small">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Dokter Jaga:</span>
+                                    <span class="fw-bold text-dark">{{ $activeQueue->poli->doctor_name }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Jam Layanan:</span>
+                                    <span class="fw-semibold text-dark">{{ $activeQueue->poli->open_time }} - {{ $activeQueue->poli->close_time }} WIB</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Keluhan:</span>
+                                    <span class="text-end text-dark fw-medium" style="max-width: 60%;">{{ $activeQueue->complaint }}</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="d-flex gap-2">
-                            <a href="{{ route('poli.detail', $activeQueue->poli->slug) }}" class="btn btn-outline-primary btn-sm w-100">
-                                <i class="bi bi-display me-1"></i> Pantau Antrian
+                            <a href="{{ route('poli.detail', $activeQueue->poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+                                <i class="bi bi-display me-1"></i> Layar Antrian Poli
                             </a>
                             @if ($activeQueue->status === 'waiting')
                                 <form action="{{ route('queue.cancel', $activeQueue->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan antrian ini?')">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
                                         <i class="bi bi-x-circle me-1"></i> Batal
                                     </button>
                                 </form>
@@ -102,9 +113,9 @@
                         </div>
                     @else
                         <div class="text-center py-5 text-muted">
-                            <div class="fs-1 text-secondary mb-2"><i class="bi bi-ticket-perforated"></i></div>
-                            <h6 class="fw-bold text-dark">Belum Ada Antrian Aktif</h6>
-                            <p class="small text-muted mb-0">Silakan pilih poliklinik pada formulir di samping untuk mengambil nomor antrian periksa hari ini.</p>
+                            <div class="fs-1 text-secondary opacity-50 mb-3"><i class="bi bi-ticket-perforated"></i></div>
+                            <h6 class="fw-bold text-dark">Belum Ada Antrian Aktif Hari Ini</h6>
+                            <p class="small text-secondary mb-0">Silakan pilih poliklinik tujuan pada formulir di samping untuk mengambil nomor antrian periksa.</p>
                         </div>
                     @endif
                 </div>
@@ -115,14 +126,14 @@
                 <div class="bg-white border rounded-4 p-4 shadow-sm h-100">
                     <div class="border-bottom pb-3 mb-3">
                         <h5 class="fw-bold mb-1">Pendaftaran Kunjungan & Antrian Baru</h5>
-                        <p class="text-muted small mb-0">Pilih poli tujuan dan tuliskan keluhan medis Anda secara ringkas.</p>
+                        <p class="text-secondary small mb-0">Pilih poli tujuan dan tuliskan keluhan medis Anda secara ringkas.</p>
                     </div>
 
                     <form action="{{ route('queue.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-3">
-                            <label for="poli_id" class="form-label small fw-bold text-secondary">Pilih Poliklinik</label>
+                            <label for="poli_id" class="form-label small fw-bold text-secondary">Pilih Poliklinik Spesialis</label>
                             <select class="form-select @error('poli_id') is-invalid @enderror" id="poli_id" name="poli_id" required>
                                 <option value="" disabled selected>-- Pilih Layanan Poli --</option>
                                 @foreach ($polies as $p)
@@ -142,12 +153,12 @@
                         <div class="mb-4">
                             <label for="complaint" class="form-label small fw-bold text-secondary">Keluhan Utama / Alasan Kunjungan</label>
                             <textarea class="form-control @error('complaint') is-invalid @enderror" id="complaint" name="complaint" rows="3" 
-                                      placeholder="Jelaskan secara singkat gejala atau keluhan kesehatan yang dirasakan (contoh: batuk pilek 3 hari, sakit gigi berlubang, konsultasi gizi)" required>{{ old('complaint') }}</textarea>
-                            <div class="form-text small">Informasi ini akan langsung diterima oleh dokter pemeriksa di poliklinik.</div>
+                                      placeholder="Jelaskan secara singkat gejala atau keluhan kesehatan yang dirasakan (contoh: demam, flu, batuk, pusing, nyeri gigi)" required>{{ old('complaint') }}</textarea>
+                            <div class="form-text small">Informasi keluhan ini akan langsung diterima dokter pemeriksa di poliklinik.</div>
                         </div>
 
                         <button type="submit" class="btn btn-kc-primary w-100 py-2 fw-bold shadow-sm">
-                            <i class="bi bi-send-check me-1"></i> Terbitkan Nomor Antrian
+                            <i class="bi bi-send-check me-1"></i> Terbitkan Nomor Antrian Sekarang
                         </button>
                     </form>
                 </div>
@@ -159,7 +170,7 @@
             <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
                 <div>
                     <h5 class="fw-bold mb-1">Riwayat Pemeriksaan Medis Anda</h5>
-                    <p class="text-muted small mb-0">Catatan kunjungan, status pemeriksaan, dan resep dokter terdahulu.</p>
+                    <p class="text-secondary small mb-0">Catatan kunjungan medis, status diagnosa, dan resep dokter terdahulu.</p>
                 </div>
             </div>
 
@@ -167,12 +178,12 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="small text-muted">Tanggal Kunjungan</th>
-                            <th class="small text-muted">Nomor Tiket</th>
-                            <th class="small text-muted">Poliklinik & Dokter</th>
-                            <th class="small text-muted">Keluhan Awal</th>
-                            <th class="small text-muted">Status</th>
-                            <th class="small text-muted">Catatan Medis / Resep</th>
+                            <th class="small text-secondary">Tanggal Kunjungan</th>
+                            <th class="small text-secondary">Nomor Tiket</th>
+                            <th class="small text-secondary">Poliklinik & Dokter</th>
+                            <th class="small text-secondary">Keluhan Awal</th>
+                            <th class="small text-secondary">Status</th>
+                            <th class="small text-secondary">Catatan Medis / Resep</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -190,7 +201,7 @@
                                         {{ $hist->status_label }}
                                     </span>
                                 </td>
-                                <td class="small text-muted">
+                                <td class="small text-dark fw-medium">
                                     {{ $hist->doctor_notes ?? '-' }}
                                 </td>
                             </tr>

@@ -22,6 +22,11 @@
     height: 42px;
     width: auto;
     object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.kc-brand:hover img {
+    transform: scale(1.05);
 }
 
 .kc-brand-text {
@@ -80,35 +85,60 @@
     color: #1e293b;
 }
 
+/* ---------------------------------------------------
+   HIGH CONTRAST FOOTER
+   Perbaikan Kontras Warna Gelap (WCAG AAA Compliant)
+----------------------------------------------------- */
+
 .kc-footer {
-    background-color: #0f172a;
-    color: #94a3b8;
+    background-color: #0b1329;
+    color: #e2e8f0;
     border-top: 1px solid #1e293b;
-    padding: 3rem 0 2rem;
-    font-size: 0.9rem;
+    padding: 3.5rem 0 2rem;
+    font-size: 0.925rem;
 }
 
 .kc-footer h5 {
-    color: #f8fafc;
+    color: #ffffff !important;
     font-weight: 700;
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
+}
+
+.kc-footer p,
+.kc-footer li {
+    color: #cbd5e1 !important;
+    line-height: 1.6;
+}
+
+.kc-footer strong {
+    color: #ffffff !important;
+}
+
+.kc-footer .text-muted {
+    color: #cbd5e1 !important;
 }
 
 .kc-footer a {
-    color: #94a3b8;
+    color: #93c5fd !important;
     text-decoration: none;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
 }
 
 .kc-footer a:hover {
-    color: #60a5fa;
+    color: #ffffff !important;
+    text-decoration: underline;
 }
 
 .kc-footer-bottom {
     border-top: 1px solid #1e293b;
     margin-top: 2.5rem;
     padding-top: 1.5rem;
-    font-size: 0.825rem;
-    color: #64748b;
+    font-size: 0.85rem;
+    color: #94a3b8 !important;
+}
+
+.kc-footer-bottom p {
+    color: #94a3b8 !important;
 }

@@ -36,7 +36,7 @@
         </div>
     @endif
 
-    {{-- Hero Section --}}
+    {{-- Hero Section with Rich Visual Presentation --}}
     <section class="kc-hero-section">
         <div class="container">
             <div class="row align-items-center justify-content-between g-5">
@@ -47,7 +47,7 @@
                     </div>
 
                     <h1 class="kc-hero-title">
-                        Layanan Kesehatan Kampus Terpadu & Terpercaya
+                        Layanan Kesehatan Kampus <span class="text-gradient-primary">Terpadu & Terpercaya</span>
                     </h1>
 
                     <p class="kc-hero-lead">
@@ -56,80 +56,103 @@
 
                     <div class="d-flex flex-wrap gap-3 mb-4">
                         @auth
-                            <a href="{{ route('user') }}" class="btn btn-kc-primary d-inline-flex align-items-center gap-2 shadow-sm">
-                                <i class="bi bi-ticket-perforated-fill"></i>
+                            <a href="{{ route('user') }}" class="btn btn-kc-primary d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-ticket-perforated-fill fs-5"></i>
                                 <span>Ambil Nomor Antrian Periksa</span>
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-kc-primary d-inline-flex align-items-center gap-2 shadow-sm">
-                                <i class="bi bi-ticket-perforated-fill"></i>
+                            <a href="{{ route('login') }}" class="btn btn-kc-primary d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-ticket-perforated-fill fs-5"></i>
                                 <span>Ambil Nomor Antrian Sekarang</span>
                             </a>
                             <a href="{{ route('register') }}" class="btn btn-kc-secondary d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-person-plus"></i>
+                                <i class="bi bi-person-plus fs-5"></i>
                                 <span>Pendaftaran Pasien Baru</span>
                             </a>
                         @endauth
                     </div>
 
-                    <div class="d-flex align-items-center gap-3 text-muted small">
+                    <div class="d-flex align-items-center gap-3 text-secondary small">
                         <div class="d-flex align-items-center gap-1">
-                            <i class="bi bi-geo-alt text-primary"></i>
+                            <i class="bi bi-geo-alt-fill text-primary"></i>
                             <span>Gedung Graha Polinema Lt. 1</span>
                         </div>
                         <span>•</span>
                         <div class="d-flex align-items-center gap-1">
-                            <i class="bi bi-telephone text-primary"></i>
+                            <i class="bi bi-telephone-fill text-success"></i>
                             <span>(0341) 404424 Ext. 119</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-5">
-                    {{-- Quick Operational Status Monitor --}}
-                    <div class="bg-white p-4 rounded-4 border shadow-sm">
-                        <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-activity text-primary fs-4"></i>
-                                <h6 class="mb-0 fw-bold">Status Antrian Hari Ini</h6>
-                            </div>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                {{ now()->translatedFormat('l, d F Y') }}
-                            </span>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="p-3 bg-light rounded-3 text-center border">
-                                    <div class="mono-num fs-2 fw-bold text-primary">{{ $waitingToday ?? 0 }}</div>
-                                    <div class="text-muted small fw-semibold text-uppercase">Antrian Menunggu</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 bg-light rounded-3 text-center border">
-                                    <div class="mono-num fs-2 fw-bold text-success">{{ $inProgressToday ?? 0 }}</div>
-                                    <div class="text-muted small fw-semibold text-uppercase">Sedang Diperiksa</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 bg-light rounded-3 text-center border">
-                                    <div class="mono-num fs-2 fw-bold text-secondary">{{ $completedToday ?? 0 }}</div>
-                                    <div class="text-muted small fw-semibold text-uppercase">Pasien Selesai</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 bg-light rounded-3 text-center border">
-                                    <div class="mono-num fs-2 fw-bold text-dark">{{ $activeDoctorsCount ?? 4 }}</div>
-                                    <div class="text-muted small fw-semibold text-uppercase">Poli Aktif Hari Ini</div>
-                                </div>
+                {{-- Hero Visual with Real Medical Imagery & Floating Badges --}}
+                <div class="col-lg-6">
+                    <div class="kc-hero-visual-wrapper position-relative text-center">
+                        {{-- Floating Badges --}}
+                        <div class="kc-floating-badge kc-floating-badge-top">
+                            <i class="bi bi-patch-check-fill text-primary fs-5"></i>
+                            <div class="text-start">
+                                <span class="d-block text-dark fw-bold">Fasilitas Resmi</span>
+                                <small class="text-muted" style="font-size: 0.725rem;">Kampus Polinema Malang</small>
                             </div>
                         </div>
 
-                        <div class="mt-3 pt-3 border-top text-center">
-                            <small class="text-muted">
-                                <i class="bi bi-shield-check text-success me-1"></i> Pelayanan terintegrasi dengan Nomor Induk Mahasiswa (NIM) & NIP Polinema
-                            </small>
+                        <div class="kc-floating-badge kc-floating-badge-bottom">
+                            <i class="bi bi-heart-pulse-fill text-danger fs-5"></i>
+                            <div class="text-start">
+                                <span class="d-block text-dark fw-bold">4 Poli Spesialis</span>
+                                <small class="text-muted" style="font-size: 0.725rem;">Layanan Medis Lengkap</small>
+                            </div>
                         </div>
+
+                        {{-- Frame Image --}}
+                        <div class="kc-hero-visual-frame">
+                            <img src="{{ asset('img/beranda.png') }}" class="kc-hero-img" alt="Tim Medis Poliklinik Polinema">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Operational Metrics Counter Strip --}}
+            <div class="row g-3 mt-4 pt-3">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="kc-metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="kc-metric-label">Antrian Menunggu</span>
+                            <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                        </div>
+                        <div class="kc-metric-value text-warning-emphasis">{{ $waitingToday ?? 0 }}</div>
+                        <small class="text-muted">Pasien dalam antrian</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="kc-metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="kc-metric-label">Sedang Diperiksa</span>
+                            <i class="bi bi-stethoscope text-primary fs-3"></i>
+                        </div>
+                        <div class="kc-metric-value text-primary">{{ $inProgressToday ?? 0 }}</div>
+                        <small class="text-muted">Di ruang dokter jaga</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="kc-metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="kc-metric-label">Pasien Selesai</span>
+                            <i class="bi bi-check2-circle text-success fs-3"></i>
+                        </div>
+                        <div class="kc-metric-value text-success">{{ $completedToday ?? 0 }}</div>
+                        <small class="text-muted">Pemeriksaan hari ini</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="kc-metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="kc-metric-label">Dokter Spesialis</span>
+                            <i class="bi bi-hospital text-info fs-3"></i>
+                        </div>
+                        <div class="kc-metric-value text-dark">{{ $activeDoctorsCount ?? 4 }}</div>
+                        <small class="text-muted">Siap melayani hari ini</small>
                     </div>
                 </div>
             </div>
@@ -140,9 +163,9 @@
     <section class="py-5" id="layanan-poli">
         <div class="container py-3">
             <div class="text-center max-w-2xl mx-auto mb-5">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">Unit Pelayanan Medis</span>
-                <h2 class="fw-bold">Layanan Poliklinik Polinema</h2>
-                <p class="text-muted">Setiap poli didukung oleh tenaga medis profesional dan peralatan klinis yang memadai untuk melayani mahasiswa dan staf.</p>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2 fw-semibold">Unit Pelayanan Medis</span>
+                <h2 class="fw-bold">Layanan 4 Poliklinik Polinema</h2>
+                <p class="text-secondary">Setiap poli didukung oleh tenaga dokter spesialis bersertifikasi serta peralatan klinis lengkap untuk melayani mahasiswa dan staf.</p>
             </div>
 
             <div class="row g-4">
@@ -156,13 +179,13 @@
                                     </div>
                                     <div>
                                         <h5 class="fw-bold mb-1">{{ $poli->name }}</h5>
-                                        <div class="badge bg-light text-dark border">
+                                        <div class="badge bg-light text-primary border fw-semibold">
                                             Kode: {{ $poli->code_prefix }}
                                         </div>
                                     </div>
                                 </div>
 
-                                <p class="text-muted small mb-3">
+                                <p class="text-secondary small mb-3">
                                     {{ Str::limit($poli->description, 110) }}
                                 </p>
                             </div>
@@ -170,16 +193,16 @@
                             <div>
                                 <div class="kc-poli-meta">
                                     <div class="d-flex align-items-center gap-1 mb-1">
-                                        <i class="bi bi-person-badge text-primary"></i>
-                                        <span class="fw-semibold">{{ $poli->doctor_name }}</span>
+                                        <i class="bi bi-person-badge-fill text-primary"></i>
+                                        <span class="fw-semibold text-dark">{{ $poli->doctor_name }}</span>
                                     </div>
-                                    <div class="d-flex align-items-center gap-1 text-muted mb-1">
-                                        <i class="bi bi-clock"></i>
+                                    <div class="d-flex align-items-center gap-1 text-secondary mb-1">
+                                        <i class="bi bi-clock-fill text-muted"></i>
                                         <span>{{ $poli->open_time }} - {{ $poli->close_time }} WIB</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2">
-                                        <span class="text-muted">Sisa Kuota:</span>
-                                        <span class="mono-num fw-bold text-primary">{{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}</span>
+                                        <span class="text-secondary">Sisa Kuota:</span>
+                                        <span class="mono-num fw-bold text-success fs-6">{{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}</span>
                                     </div>
                                 </div>
 
@@ -200,9 +223,9 @@
     <section class="py-5 bg-white border-top border-bottom" id="alur-periksa">
         <div class="container py-3">
             <div class="text-center max-w-2xl mx-auto mb-5">
-                <span class="badge bg-secondary-subtle text-secondary border px-3 py-1 mb-2">Panduan Pengunjung</span>
+                <span class="badge bg-secondary-subtle text-secondary border px-3 py-1 mb-2 fw-semibold">Panduan Pasien</span>
                 <h2 class="fw-bold">Alur Pendaftaran & Pemeriksaan Medis</h2>
-                <p class="text-muted">Tiga langkah mudah untuk mendapatkan pelayanan kesehatan di Poliklinik Politeknik Negeri Malang.</p>
+                <p class="text-secondary">Tiga langkah mudah untuk mendapatkan pelayanan kesehatan profesional di Poliklinik Politeknik Negeri Malang.</p>
             </div>
 
             <div class="row g-4">
@@ -210,7 +233,7 @@
                     <div class="kc-step-box">
                         <div class="kc-step-num">01</div>
                         <h5 class="fw-bold mb-2">Daftar Antrian Online</h5>
-                        <p class="text-muted small mb-0">
+                        <p class="text-secondary small mb-0">
                             Masuk dengan akun civitas akademika (NIM/NIP), pilih Poliklinik tujuan, tentukan tanggal kunjungan, dan tuliskan keluhan kesehatan utama Anda.
                         </p>
                     </div>
@@ -220,7 +243,7 @@
                     <div class="kc-step-box">
                         <div class="kc-step-num">02</div>
                         <h5 class="fw-bold mb-2">Datang & Pantau Antrian</h5>
-                        <p class="text-muted small mb-0">
+                        <p class="text-secondary small mb-0">
                             Kunjungi Poliklinik di Gedung Graha Polinema Lt. 1. Pantau panggilan nomor antrian Anda secara langsung melalui monitor atau ponsel.
                         </p>
                     </div>
@@ -230,8 +253,8 @@
                     <div class="kc-step-box">
                         <div class="kc-step-num">03</div>
                         <h5 class="fw-bold mb-2">Pemeriksaan & Resep Obat</h5>
-                        <p class="text-muted small mb-0">
-                            Konsultasikan keluhan medis dengan dokter jaga. Terima resep obat, surat rujukan, atau surat izin sakit resmi jika diperlukan.
+                        <p class="text-secondary small mb-0">
+                            Konsultasikan keluhan medis dengan dokter jaga. Terima resep obat, surat rujukan, atau surat keterangan sakit resmi jika diperlukan.
                         </p>
                     </div>
                 </div>
@@ -239,23 +262,27 @@
         </div>
     </section>
 
-    {{-- Footer --}}
+    {{-- High-Contrast Legible Footer --}}
     <footer class="kc-footer">
         <div class="container">
             <div class="row g-4 justify-content-between">
                 <div class="col-lg-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <img src="{{ asset('img/klickCare-logo.png') }}" alt="Logo" height="36">
-                        <h5 class="text-white mb-0 fw-bold">KlickCare Polinema</h5>
+                        <img src="{{ asset('img/klickCare-logo.png') }}" alt="Logo" height="40">
+                        <h5 class="mb-0 fw-bold">KlickCare Polinema</h5>
                     </div>
-                    <p class="text-muted small">
+                    <p class="small">
                         Unit Pelayanan Kesehatan Resmi Politeknik Negeri Malang. Berdedikasi menjaga kesehatan sivitas akademika demi terciptanya generasi unggul dan berprestasi.
                     </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Fasilitas Kampus</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Layanan Gratis Sivitas</span>
+                    </div>
                 </div>
 
                 <div class="col-lg-3 col-md-6">
                     <h5>Jam Pelayanan Medis</h5>
-                    <ul class="list-unstyled text-muted small">
+                    <ul class="list-unstyled small">
                         <li class="mb-2"><strong>Senin - Kamis:</strong> 08:00 - 15:30 WIB</li>
                         <li class="mb-2"><strong>Jumat:</strong> 08:00 - 11:30 & 13:00 - 15:00 WIB</li>
                         <li class="mb-2"><strong>Sabtu - Minggu:</strong> Tutup (Pelayanan Darurat Rujukan)</li>
@@ -263,15 +290,15 @@
                 </div>
 
                 <div class="col-lg-4 col-md-6">
-                    <h5>Lokasi & Kontak</h5>
-                    <p class="text-muted small mb-1">
-                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Gedung Graha Polinema Lantai 1, Jl. Soekarno Hatta No. 9, Kota Malang, Jawa Timur 65141
+                    <h5>Lokasi & Kontak Darurat</h5>
+                    <p class="small mb-2">
+                        <i class="bi bi-geo-alt-fill text-danger me-2"></i> Gedung Graha Polinema Lantai 1, Jl. Soekarno Hatta No. 9, Kota Malang, Jawa Timur 65141
                     </p>
-                    <p class="text-muted small mb-1">
-                        <i class="bi bi-telephone-fill text-success me-1"></i> (0341) 404424 / 404425
+                    <p class="small mb-2">
+                        <i class="bi bi-telephone-fill text-success me-2"></i> Telepon: (0341) 404424 / 404425
                     </p>
-                    <p class="text-muted small">
-                        <i class="bi bi-envelope-fill text-primary me-1"></i> poliklinik@polinema.ac.id
+                    <p class="small">
+                        <i class="bi bi-envelope-fill text-info me-2"></i> Email: <a href="mailto:poliklinik@polinema.ac.id">poliklinik@polinema.ac.id</a>
                     </p>
                 </div>
             </div>
