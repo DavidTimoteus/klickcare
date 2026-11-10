@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 // Halaman Publik (Beranda & Informasi Poliklinik)
 Route::get('/', [DashboardController::class, 'landing'])->name('home');
 Route::get('/poli/{slug}', [DashboardController::class, 'poliDetail'])->name('poli.detail');
+Route::get('/poli/{slug}/live-status', [DashboardController::class, 'livePoliStatus'])->name('poli.live_status');
 
 // Rute Autentikasi Pengguna (Khusus Tamu / Belum Login)
 Route::middleware('guest')->group(function () {

@@ -39,7 +39,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Halaman Detail Poliklinik Spesifik
+     * Halaman Detail Poliklinik Spesifik (Layar Monitor Antrian Publik)
      */
     public function poliDetail(string $slug): View
     {
@@ -48,13 +48,68 @@ class DashboardController extends Controller
 
         $activeQueues = $poli->queues()
             ->whereDate('visit_date', $todayDate)
-            ->whereIn('status', ['waiting', 'in_progress'])
+            ->whereIn('status', ['waiting', 'in_progress', 'skipped'])
+            ->orderByRaw("
+                CASE 
+                    WHEN status = 'in_progress' THEN 1 
+                    WHEN status = 'waiting' THEN 2 
+                    ELSE 3 
+                END
+            ")
             ->orderBy('queue_number')
             ->get();
 
         $currentCalling = $activeQueues->firstWhere('status', 'in_progress');
 
         return view('poliDetail', compact('poli', 'activeQueues', 'currentCalling'));
+    }
+
+    /**
+     * Endpoint API Live Real-Time Sinkronisasi Layar Antrian & Audio Trigger
+     */
+    public function livePoliStatus(string $slug): JsonResponse
+    {
+        $poli = Poli::where('slug', $slug)->firstOrFail();
+        $todayDate = today()->format('Y-m-d');
+
+        $activeQueues = $poli->queues()
+            ->whereDate('visit_date', $todayDate)
+            ->whereIn('status', ['waiting', 'in_progress', 'skipped'])
+            ->orderByRaw("
+                CASE 
+                    WHEN status = 'in_progress' THEN 1 
+                    WHEN status = 'waiting' THEN 2 
+                    ELSE 3 
+                END
+            ")
+            ->orderBy('queue_number')
+            ->get();
+
+        $currentCalling = $activeQueues->firstWhere('status', 'in_progress');
+
+        return response()->json([
+            'poli_name' => $poli->name,
+            'room' => $poli->room,
+            'remaining_quota' => $poli->remainingQuotaToday(),
+            'current_calling' => $currentCalling ? [
+                'id' => $currentCalling->id,
+                'queue_code' => $currentCalling->queue_code,
+                'status' => $currentCalling->status,
+            ] : null,
+            'waiting_count' => $activeQueues->where('status', 'waiting')->count(),
+            'skipped_count' => $activeQueues->where('status', 'skipped')->count(),
+            'queues' => $activeQueues->map(function ($q) {
+                return [
+                    'id' => $q->id,
+                    'queue_code' => $q->queue_code,
+                    'status' => $q->status,
+                    'status_label' => $q->status_label,
+                    'status_badge' => $q->status_badge_class,
+                    'time' => $q->created_at->format('H:i') . ' WIB',
+                ];
+            }),
+            'timestamp' => now()->toIso8601String(),
+        ]);
     }
 
     /**
