@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg kc-navbar sticky-top">
-    <div class="container">
+    <div class="container-fluid px-lg-4 px-3">
         <a class="kc-brand" href="{{ route('home') }}">
             <img src="{{ asset('img/klickCare-logo.png') }}" alt="KlickCare Logo">
             <div class="kc-brand-text">
@@ -50,20 +50,22 @@
                         </li>
                     @endif
 
-                    <li class="nav-item ms-lg-3 my-2 my-lg-0">
+                    <li class="nav-item ms-lg-2 my-2 my-lg-0">
                         <div class="kc-user-pill">
-                            <i class="bi bi-person-check-fill text-primary"></i>
-                            <span class="text-truncate" style="max-width: 140px;">{{ Auth::user()->name }}</span>
-                            <span class="badge bg-primary text-white" style="font-size: 0.675rem;">
+                            <span class="kc-user-avatar">
+                                <i class="bi bi-person-fill text-primary"></i>
+                            </span>
+                            <span class="kc-user-name" title="{{ Auth::user()->name }}">{{ Auth::user()->name }}</span>
+                            <span class="badge {{ Auth::user()->isAdmin() ? 'bg-primary text-white' : 'bg-light text-secondary border' }}" style="font-size: 0.675rem;">
                                 {{ Auth::user()->role_label }}
                             </span>
                         </div>
                     </li>
 
                     <li class="nav-item ms-lg-2 my-1 my-lg-0">
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline m-0">
                             @csrf
-                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-1 fw-semibold w-100 w-lg-auto">
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-1 fw-semibold w-100 w-lg-auto" title="Keluar">
                                 <i class="bi bi-box-arrow-right me-1"></i> Keluar
                             </button>
                         </form>
