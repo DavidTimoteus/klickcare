@@ -33,7 +33,29 @@
             </div>
         @endif
 
-        @if (session('error'))
+        @if ($errors->any())
+            <div class="kc-toast kc-toast-danger" role="alert" data-bs-delay="5500">
+                <div class="kc-toast-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="kc-toast-content">
+                    <strong class="kc-toast-title">Perhatian</strong>
+                    @if ($errors->count() > 1)
+                        <ul class="kc-toast-list mb-0 ps-3 small text-secondary">
+                            @foreach ($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="kc-toast-message">{{ $errors->first() }}</div>
+                    @endif
+                </div>
+                <button type="button" class="kc-toast-close" onclick="dismissKcToast(this.closest('.kc-toast'))" aria-label="Tutup">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="kc-toast-progress kc-toast-progress-danger"></div>
+            </div>
+        @elseif (session('error'))
             <div class="kc-toast kc-toast-danger" role="alert" data-bs-delay="5000">
                 <div class="kc-toast-icon">
                     <i class="bi bi-x-circle-fill"></i>
@@ -43,23 +65,7 @@
                     <div class="kc-toast-message">{{ session('error') }}</div>
                 </div>
                 <button type="button" class="kc-toast-close" onclick="dismissKcToast(this.closest('.kc-toast'))" aria-label="Tutup">
-                    <i class="bi bi-x"></i>
-                </button>
-                <div class="kc-toast-progress kc-toast-progress-danger"></div>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="kc-toast kc-toast-danger" role="alert" data-bs-delay="5000">
-                <div class="kc-toast-icon">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <div class="kc-toast-content">
-                    <strong class="kc-toast-title">Perhatian</strong>
-                    <div class="kc-toast-message">{{ $errors->first() }}</div>
-                </div>
-                <button type="button" class="kc-toast-close" onclick="dismissKcToast(this.closest('.kc-toast'))" aria-label="Tutup">
-                    <i class="bi bi-x"></i>
+                    <i class="bi bi-x-lg"></i>
                 </button>
                 <div class="kc-toast-progress kc-toast-progress-danger"></div>
             </div>
