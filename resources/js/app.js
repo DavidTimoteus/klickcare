@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPoliFilterTabs();
     initClinicOperatingStatus();
     initNavbarEnhancements();
+    initScrollSpy();
 });
 
 /**
@@ -177,4 +178,41 @@ function initNavbarEnhancements() {
             });
         });
     }
+}
+
+/**
+ * 5. Active ScrollSpy for Homepage Sections
+ * Automatically synchronizes active navbar link with current viewport section.
+ */
+function initScrollSpy() {
+    const layananSection = document.getElementById('layanan-poli');
+    const alurSection = document.getElementById('alur-periksa');
+    const navBeranda = document.getElementById('navBeranda');
+    const navLayanan = document.getElementById('navLayananPoli');
+    const navAlur = document.getElementById('navAlurPeriksa');
+
+    if (!layananSection || !alurSection || !navBeranda || !navLayanan || !navAlur) return;
+
+    function onScroll() {
+        const scrollPos = window.scrollY + 120; // 120px offset for sticky navbar
+        const layananTop = layananSection.offsetTop;
+        const alurTop = alurSection.offsetTop;
+
+        if (scrollPos >= alurTop) {
+            navBeranda.classList.remove('active');
+            navLayanan.classList.remove('active');
+            navAlur.classList.add('active');
+        } else if (scrollPos >= layananTop) {
+            navBeranda.classList.remove('active');
+            navLayanan.classList.add('active');
+            navAlur.classList.remove('active');
+        } else {
+            navBeranda.classList.add('active');
+            navLayanan.classList.remove('active');
+            navAlur.classList.remove('active');
+        }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 }

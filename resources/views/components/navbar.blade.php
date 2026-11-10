@@ -15,17 +15,17 @@
         <div class="collapse navbar-collapse justify-content-end" id="kcNavbarContent">
             <ul class="navbar-nav align-items-lg-center gap-lg-1 my-3 my-lg-0">
                 <li class="nav-item">
-                    <a class="kc-nav-link {{ request()->routeIs('home') && !request()->has('poli_id') ? 'active' : '' }}" href="{{ route('home') }}">
+                    <a class="kc-nav-link {{ request()->routeIs('home') ? 'active' : '' }}" id="navBeranda" href="{{ route('home') }}">
                         <i class="bi bi-house-door me-1"></i> Beranda
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="kc-nav-link" href="{{ request()->routeIs('home') ? '#layanan-poli' : route('home') . '#layanan-poli' }}">
+                    <a class="kc-nav-link {{ request()->routeIs('poli.*') ? 'active' : '' }}" id="navLayananPoli" href="{{ request()->routeIs('home') ? '#layanan-poli' : route('home') . '#layanan-poli' }}">
                         <i class="bi bi-heart-pulse me-1"></i> Layanan Poliklinik
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="kc-nav-link" href="{{ request()->routeIs('home') ? '#alur-periksa' : route('home') . '#alur-periksa' }}">
+                    <a class="kc-nav-link" id="navAlurPeriksa" href="{{ request()->routeIs('home') ? '#alur-periksa' : route('home') . '#alur-periksa' }}">
                         <i class="bi bi-diagram-3 me-1"></i> Alur Periksa
                     </a>
                 </li>
