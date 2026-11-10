@@ -103,19 +103,26 @@
                                         <span class="kc-pulse-dot d-inline-block me-1"></span> Giliran Anda Sekarang! Silakan masuk ke ruang dokter.
                                     </span>
                                 </div>
+                            @elseif ($activeQueue->status === 'skipped')
+                                <div class="mt-2 p-2 bg-warning-subtle border border-warning rounded-3 text-center">
+                                    <span class="small text-warning-emphasis fw-bold">
+                                        <i class="bi bi-clock-history me-1"></i> Panggilan Anda Sempat Dilewati
+                                        <div class="small fw-normal text-secondary mt-1">Harap bersiap di depan ruang dokter. Dokter akan memanggil ulang setelah antrian saat ini selesai.</div>
+                                    </span>
+                                </div>
                             @endif
                         </div>
 
                         {{-- Action Buttons: Pantau Layar Poli & Batalkan Antrian --}}
                         <div class="row g-2">
-                            <div class="{{ $activeQueue->status === 'waiting' ? 'col-8' : 'col-12' }}">
+                            <div class="{{ in_array($activeQueue->status, ['waiting', 'skipped']) ? 'col-8' : 'col-12' }}">
                                 <a href="{{ route('poli.detail', $activeQueue->poli->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center gap-1">
                                     <i class="bi bi-display"></i>
                                     <span>Pantau Layar Poli</span>
                                     <i class="bi bi-box-arrow-up-right small ms-1" style="font-size: 0.725rem;"></i>
                                 </a>
                             </div>
-                            @if ($activeQueue->status === 'waiting')
+                            @if (in_array($activeQueue->status, ['waiting', 'skipped']))
                                 <div class="col-4">
                                     <form action="{{ route('queue.cancel', $activeQueue->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan antrian ini?')">
                                         @csrf

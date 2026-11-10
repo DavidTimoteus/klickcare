@@ -160,11 +160,29 @@
                                                     <i class="bi bi-megaphone me-1"></i> Panggil
                                                 </button>
                                             </form>
+                                        @elseif ($q->status === 'skipped')
+                                            {{-- Tombol Panggil Ulang (Recall) --}}
+                                            <form action="{{ route('admin.queue.status', $q->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status" value="in_progress">
+                                                <button type="submit" class="btn btn-outline-primary btn-sm fw-semibold" title="Panggil Ulang Pasien">
+                                                    <i class="bi bi-arrow-repeat me-1"></i> Panggil Ulang
+                                                </button>
+                                            </form>
                                         @elseif ($q->status === 'in_progress')
                                             {{-- Tombol Selesaikan dengan Catatan --}}
-                                            <button type="button" class="btn btn-success btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#completeModal{{ $q->id }}">
+                                            <button type="button" class="btn btn-success btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#completeModal{{ $q->id }}" title="Selesaikan Pemeriksaan">
                                                 <i class="bi bi-check2-circle me-1"></i> Selesaikan
                                             </button>
+
+                                            {{-- Tombol Lewati (Pasien Tidak di Tempat) --}}
+                                            <form action="{{ route('admin.queue.status', $q->id) }}" method="POST" onsubmit="return confirm('Pasien {{ $q->queue_code }} belum berada di tempat? Lewati untuk dipanggil nanti?')">
+                                                @csrf
+                                                <input type="hidden" name="status" value="skipped">
+                                                <button type="submit" class="btn btn-outline-warning btn-sm fw-semibold" title="Lewati Pasien">
+                                                    <i class="bi bi-skip-forward"></i> Lewati
+                                                </button>
+                                            </form>
                                         @endif
 
                                         @if ($q->status !== 'completed' && $q->status !== 'cancelled')

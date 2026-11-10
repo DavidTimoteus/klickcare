@@ -217,8 +217,9 @@ class DashboardController extends Controller
             CASE 
                 WHEN status = 'in_progress' THEN 1 
                 WHEN status = 'waiting' THEN 2 
-                WHEN status = 'completed' THEN 3 
-                ELSE 4 
+                WHEN status = 'skipped' THEN 3
+                WHEN status = 'completed' THEN 4 
+                ELSE 5 
             END
         ")->orderBy('queue_number')->get();
 
@@ -241,13 +242,29 @@ class DashboardController extends Controller
 
     /**
      * Update Status Antrian & Catatan Dokter oleh Admin/Petugas Medis
+     * Menegakkan aturan: 1 pasien aktif per poli & alur Lewati (Skipped)
      */
     public function updateQueueStatus(Request $request, Queue $queue): RedirectResponse
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:waiting,in_progress,completed,cancelled'],
+            'status' => ['required', 'in:waiting,in_progress,skipped,completed,cancelled'],
             'doctor_notes' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        // Aturan Integritas Medis: Hanya boleh ada 1 pasien berstatus in_progress per poli pada tanggal kunjungan
+        if ($validated['status'] === 'in_progress') {
+            $currentlyActive = Queue::where('poli_id', $queue->poli_id)
+                ->whereDate('visit_date', $queue->visit_date)
+                ->where('status', 'in_progress')
+                ->where('id', '!=', $queue->id)
+                ->first();
+
+            if ($currentlyActive) {
+                return back()->withErrors([
+                    'queue' => "Poli {$queue->poli->name} sedang memeriksa pasien {$currentlyActive->queue_code}. Selesaikan atau lewati pasien tersebut terlebih dahulu sebelum memanggil pasien baru.",
+                ]);
+            }
+        }
 
         $queue->status = $validated['status'];
         if (isset($validated['doctor_notes'])) {
@@ -257,7 +274,8 @@ class DashboardController extends Controller
 
         $statusMsg = match ($validated['status']) {
             'in_progress' => "Pasien {$queue->user->name} ({$queue->queue_code}) sedang dipanggil ke ruang periksa.",
-            'completed' => "Pemeriksaan pasien {$queue->user->name} ({$queue->queue_code}) telah selesai.",
+            'skipped' => "Pasien {$queue->user->name} ({$queue->queue_code}) telah dilewati dan dapat dipanggil ulang nanti.",
+            'completed' => "Pemeriksaan pasien {$queue->user->name} ({$queue->queue_code}) telah selesai dicatat.",
             'cancelled' => "Antrian {$queue->queue_code} telah dibatalkan.",
             default => "Status antrian {$queue->queue_code} berhasil diperbarui.",
         };
