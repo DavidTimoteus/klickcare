@@ -77,22 +77,28 @@ function initPoliFilterTabs() {
             filterPills.forEach(p => p.classList.remove('active'));
             pill.classList.add('active');
 
-            // Filter cards with smooth fade
+            // Filter cards with smooth fade & spotlight pulse
             cardCols.forEach(col => {
                 const slug = col.getAttribute('data-poli-slug');
+                const card = col.querySelector('.kc-poli-card');
                 if (filter === 'all' || slug === filter) {
                     col.style.display = 'block';
                     col.style.opacity = '0';
-                    col.style.transform = 'translateY(10px) scale(0.98)';
+                    col.style.transform = 'translateY(12px) scale(0.98)';
                     setTimeout(() => {
-                        col.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                        col.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
                         col.style.opacity = '1';
                         col.style.transform = 'translateY(0) scale(1)';
+                        if (filter !== 'all' && card) {
+                            card.classList.remove('kc-spotlight');
+                            void card.offsetWidth; // trigger browser reflow
+                            card.classList.add('kc-spotlight');
+                        }
                     }, 20);
                 } else {
                     col.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
                     col.style.opacity = '0';
-                    col.style.transform = 'scale(0.96)';
+                    col.style.transform = 'scale(0.95)';
                     setTimeout(() => {
                         col.style.display = 'none';
                     }, 200);

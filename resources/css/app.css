@@ -410,6 +410,124 @@ h1, h2, h3, h4, h5, h6, .display-font {
 }
 
 /* ---------------------------------------------------
+   MOTION & TRANSITION DESIGN SYSTEM
+   High-performance micro-interactions & fluid clinical animations
+----------------------------------------------------- */
+
+/* Page & Section Entrance */
+.kc-fade-in-up {
+    animation: kcSpringFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes kcSpringFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Service Selection Spotlight Pulse */
+@keyframes kcServiceSpotlight {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+        transform: translateY(0) scale(0.98);
+    }
+    40% {
+        box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.18);
+        transform: translateY(-6px) scale(1.02);
+    }
+    100% {
+        box-shadow: var(--kc-shadow-elevated);
+        transform: translateY(-4px) scale(1);
+    }
+}
+
+.kc-poli-card.kc-spotlight {
+    animation: kcServiceSpotlight 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    border-color: #3b82f6 !important;
+}
+
+/* Button Micro-Interactions */
+.btn {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn:active {
+    transform: scale(0.97) translateY(1px) !important;
+}
+
+.btn-kc-primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-kc-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transform: skewX(-20deg);
+    transition: none;
+}
+
+.btn-kc-primary:hover::after {
+    left: 140%;
+    transition: left 0.75s ease-in-out;
+}
+
+/* Medical Heartbeat Animation */
+.kc-heartbeat {
+    display: inline-block;
+    animation: kcHeartbeat 2.4s ease-in-out infinite;
+}
+
+@keyframes kcHeartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.22);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.15);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+/* Modal Spring Scale Animation */
+.modal.fade .modal-dialog {
+    transform: scale(0.92) translateY(-15px);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+    opacity: 0;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Interactive Table Row Hover Micro-Transition */
+.table-hover tbody tr {
+    transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.table-hover tbody tr:hover {
+    transform: translateX(3px);
+}
+
+/* ---------------------------------------------------
    Buttons & Interactive Elements
 ----------------------------------------------------- */
 
