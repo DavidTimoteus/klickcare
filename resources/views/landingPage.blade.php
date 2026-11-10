@@ -155,19 +155,29 @@
             </div>
 
             {{-- Interactive Category Filter Tabs --}}
-            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" id="poliFilterTabs">
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3" id="poliFilterTabs">
                 <button type="button" class="btn btn-sm kc-filter-pill active" data-filter="all">
                     <i class="bi bi-grid-fill me-1"></i> Semua Poli ({{ $polies->count() }})
                 </button>
                 @foreach ($polies as $p)
-                    <button type="button" class="btn btn-sm kc-filter-pill" data-filter="{{ $p->slug }}">
+                    <button type="button" class="btn btn-sm kc-filter-pill" data-filter="{{ $p->slug }}" data-poli-name="{{ $p->name }}">
                         <img src="{{ asset($p->icon_path) }}" height="15" class="me-1" onerror="this.style.display='none'">
                         {{ $p->name }}
                     </button>
                 @endforeach
             </div>
 
-            <div class="row g-4" id="poliCardsRow">
+            <div id="poliFilterNotice" class="text-center mb-4 d-none">
+                <span class="badge bg-light text-secondary border px-3 py-2 fw-medium shadow-xs">
+                    <i class="bi bi-info-circle text-primary me-1"></i>
+                    Fokus Layanan: <strong class="text-dark" id="poliFilterNoticeName">Layanan</strong> &bull;
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-1 fw-bold text-primary text-decoration-none" id="btnResetPoliFilter">
+                        Tampilkan Semua Poli ({{ $polies->count() }}) &rarr;
+                    </button>
+                </span>
+            </div>
+
+            <div class="row g-4 justify-content-center" id="poliCardsRow">
                 @foreach ($polies as $poli)
                     <div class="col-md-6 col-lg-3 poli-card-col" data-poli-slug="{{ $poli->slug }}">
                         <div class="kc-poli-card">
