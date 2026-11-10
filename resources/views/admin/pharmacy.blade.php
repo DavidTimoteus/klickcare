@@ -180,60 +180,19 @@
                                     {{ $m->description ?? '-' }}
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold rounded-2" data-bs-toggle="modal" data-bs-target="#restockModal{{ $m->id }}">
+                                    <button type="button" 
+                                            class="btn btn-outline-primary btn-sm fw-semibold rounded-2" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#restockModal"
+                                            data-id="{{ $m->id }}"
+                                            data-name="{{ $m->name }}"
+                                            data-code="{{ $m->code }}"
+                                            data-category="{{ $m->category }}"
+                                            data-unit="{{ $m->unit }}"
+                                            data-stock="{{ $m->stock }}"
+                                            data-is-low="{{ $m->isLowStock() ? '1' : '0' }}">
                                         <i class="bi bi-plus-lg me-1"></i> Restock
                                     </button>
-
-                                    {{-- Modal Restock Obat --}}
-                                    <div class="modal fade" id="restockModal{{ $m->id }}" tabindex="-1" aria-labelledby="restockModalLabel{{ $m->id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <form action="{{ route('admin.pharmacy.stock') }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="medicine_id" value="{{ $m->id }}">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title fw-bold" id="restockModalLabel{{ $m->id }}">
-                                                            Restock Obat: {{ $m->name }}
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body text-start">
-                                                        <div class="p-3 bg-light rounded-3 border mb-3">
-                                                            <div class="d-flex justify-content-between mb-1 small">
-                                                                <span class="text-muted">Kode Obat:</span>
-                                                                <span class="mono-num fw-bold">{{ $m->code }}</span>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between mb-1 small">
-                                                                <span class="text-muted">Kategori:</span>
-                                                                <span class="fw-semibold">{{ $m->category }}</span>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between small">
-                                                                <span class="text-muted">Stok Saat Ini:</span>
-                                                                <span class="mono-num fw-bold {{ $m->isLowStock() ? 'text-danger' : 'text-success' }}">
-                                                                    {{ $m->stock }} {{ $m->unit }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label for="stockInput{{ $m->id }}" class="form-label small fw-bold">Jumlah Penambahan Stok ({{ $m->unit }}):</label>
-                                                            <div class="input-group">
-                                                                <input type="number" id="stockInput{{ $m->id }}" name="additional_stock" class="form-control" min="1" max="10000" placeholder="Contoh: 50" required>
-                                                                <span class="input-group-text bg-light text-muted">{{ $m->unit }}</span>
-                                                            </div>
-                                                            <small class="text-muted">Stok akan langsung ditambahkan ke inventaris poliklinik secara terverifikasi.</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
-                                                            <i class="bi bi-check2 me-1"></i> Simpan Penambahan
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -256,19 +215,71 @@
         </div>
     </div>
 
+    {{-- Single Dynamic Modal Restock Obat (Zero-Flicker Root Level) --}}
+    <div class="modal fade" id="restockModal" tabindex="-1" aria-labelledby="restockModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('admin.pharmacy.stock') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="medicine_id" id="restockMedicineId" value="">
+                    <div class="modal-header bg-light border-bottom">
+                        <h5 class="modal-title fw-bold" id="restockModalLabel">
+                            <i class="bi bi-capsule text-primary me-2"></i>Restock Obat: <span id="restockMedicineNameTitle" class="text-dark">-</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start p-4">
+                        <div class="p-3 bg-light rounded-3 border mb-3">
+                            <div class="d-flex justify-content-between mb-1 small">
+                                <span class="text-muted">Kode Obat:</span>
+                                <span class="mono-num fw-bold text-dark" id="restockMedicineCode">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1 small">
+                                <span class="text-muted">Kategori:</span>
+                                <span class="fw-semibold text-dark" id="restockMedicineCategory">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-muted">Stok Saat Ini:</span>
+                                <span class="mono-num fw-bold" id="restockMedicineCurrentStock">-</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="restockAdditionalStockInput" class="form-label small fw-bold">
+                                Jumlah Penambahan Stok (<span id="restockMedicineUnitLabel">unit</span>): <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-primary"><i class="bi bi-plus-circle"></i></span>
+                                <input type="number" id="restockAdditionalStockInput" name="additional_stock" class="form-control" min="1" max="10000" placeholder="Contoh: 50" required autofocus>
+                                <span class="input-group-text bg-light text-muted" id="restockMedicineUnitAddon">unit</span>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Stok akan langsung ditambahkan ke inventaris poliklinik secara terverifikasi.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-top">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-3" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold rounded-3">
+                            <i class="bi bi-check2 me-1"></i> Simpan Penambahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal Tambah Obat Baru --}}
     <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg">
                 <form action="{{ route('admin.pharmacy.store') }}" method="POST">
                     @csrf
-                    <div class="modal-header">
+                    <div class="modal-header bg-light border-bottom">
                         <h5 class="modal-title fw-bold" id="addMedicineModalLabel">
                             <i class="bi bi-capsule text-primary me-2"></i> Tambah Item Obat ke Katalog Farmasi
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-start">
+                    <div class="modal-body text-start p-4">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold">Kode Obat <span class="text-danger">*</span></label>
@@ -301,9 +312,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                    <div class="modal-footer bg-light border-top">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-3" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold rounded-3">
                             <i class="bi bi-save me-1"></i> Simpan Obat Baru
                         </button>
                     </div>
@@ -313,5 +324,40 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const restockModal = document.getElementById('restockModal');
+            if (restockModal) {
+                restockModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    if (!button) return;
+
+                    const id = button.getAttribute('data-id');
+                    const name = button.getAttribute('data-name');
+                    const code = button.getAttribute('data-code');
+                    const category = button.getAttribute('data-category');
+                    const unit = button.getAttribute('data-unit');
+                    const stock = button.getAttribute('data-stock');
+                    const isLow = button.getAttribute('data-is-low') === '1';
+
+                    document.getElementById('restockMedicineId').value = id || '';
+                    document.getElementById('restockMedicineNameTitle').textContent = name || '-';
+                    document.getElementById('restockMedicineCode').textContent = code || '-';
+                    document.getElementById('restockMedicineCategory').textContent = category || '-';
+                    
+                    const stockEl = document.getElementById('restockMedicineCurrentStock');
+                    stockEl.textContent = (stock || '0') + ' ' + (unit || '');
+                    stockEl.className = 'mono-num fw-bold ' + (isLow ? 'text-danger' : 'text-success');
+
+                    document.getElementById('restockMedicineUnitLabel').textContent = unit || 'unit';
+                    document.getElementById('restockMedicineUnitAddon').textContent = unit || 'unit';
+                    
+                    const inputEl = document.getElementById('restockAdditionalStockInput');
+                    inputEl.value = '';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
+
