@@ -64,12 +64,18 @@ class EndToEndClinicalFlowTest extends TestCase
         $bookResponse->assertRedirect('/KlickCare');
         $bookResponse->assertSessionHas('success');
 
-        // Check active ticket on dashboard
+        // Check active ticket on dashboard with verified encryption
         $this->assertDatabaseHas('tbl_queues', [
             'poli_id' => $poliGigi->id,
-            'complaint' => 'Pemeriksaan sakit gigi geraham berlubang',
             'status' => 'waiting',
         ]);
+        $studentUser = User::where('email', 'ahmad.fauzi@student.polinema.ac.id')->firstOrFail();
+        $createdQueue = Queue::where('poli_id', $poliGigi->id)->where('user_id', $studentUser->id)->firstOrFail();
+        $this->assertEquals('Pemeriksaan sakit gigi geraham berlubang', $createdQueue->complaint);
+
+        // Verify raw database row is encrypted (not plaintext)
+        $rawComplaint = \Illuminate\Support\Facades\DB::table('tbl_queues')->where('id', $createdQueue->id)->value('complaint');
+        $this->assertNotEquals('Pemeriksaan sakit gigi geraham berlubang', $rawComplaint);
 
         $portalAfterBooking = $this->get('/KlickCare');
         $portalAfterBooking->assertStatus(200);

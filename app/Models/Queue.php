@@ -26,6 +26,8 @@ class Queue extends Model
     protected $casts = [
         'visit_date' => 'date',
         'queue_number' => 'integer',
+        'complaint' => 'encrypted',
+        'doctor_notes' => 'encrypted',
     ];
 
     public function user(): BelongsTo
@@ -43,6 +45,7 @@ class Queue extends Model
         return match ($this->status) {
             'waiting' => 'Menunggu Panggilan',
             'in_progress' => 'Sedang Diperiksa',
+            'skipped' => 'Dilewati (Menunggu Panggil Ulang)',
             'completed' => 'Selesai',
             'cancelled' => 'Dibatalkan',
             default => ucfirst($this->status),
@@ -54,6 +57,7 @@ class Queue extends Model
         return match ($this->status) {
             'waiting' => 'bg-warning-subtle text-warning-emphasis border-warning',
             'in_progress' => 'bg-primary-subtle text-primary-emphasis border-primary',
+            'skipped' => 'bg-secondary-subtle text-dark border-secondary',
             'completed' => 'bg-success-subtle text-success-emphasis border-success',
             'cancelled' => 'bg-danger-subtle text-danger-emphasis border-danger',
             default => 'bg-secondary-subtle text-secondary-emphasis',

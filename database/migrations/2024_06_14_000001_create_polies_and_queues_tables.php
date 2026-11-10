@@ -35,11 +35,13 @@ return new class extends Migration
             $table->unsignedInteger('queue_number');
             $table->date('visit_date');
             $table->text('complaint');
-            $table->enum('status', ['waiting', 'in_progress', 'completed', 'cancelled'])->default('waiting');
+            $table->enum('status', ['waiting', 'in_progress', 'skipped', 'completed', 'cancelled'])->default('waiting');
             $table->text('doctor_notes')->nullable();
             $table->timestamps();
 
             $table->index(['visit_date', 'poli_id']);
+            $table->index(['visit_date', 'poli_id', 'status']);
+            $table->unique(['visit_date', 'poli_id', 'queue_number'], 'unique_daily_poli_queue');
         });
     }
 

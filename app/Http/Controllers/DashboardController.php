@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Poli;
 use App\Models\Queue;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -64,11 +66,11 @@ class DashboardController extends Controller
         $polies = Poli::where('is_active', true)->get();
         $todayDate = today()->format('Y-m-d');
 
-        // Tiket antrian aktif pasien hari ini
+        // Tiket antrian aktif pasien hari ini (menunggu, sedang diperiksa, atau dilewati)
         $activeQueue = Queue::with('poli')
             ->where('user_id', $user->id)
             ->whereDate('visit_date', $todayDate)
-            ->whereIn('status', ['waiting', 'in_progress'])
+            ->whereIn('status', ['waiting', 'in_progress', 'skipped'])
             ->latest()
             ->first();
 
@@ -92,7 +94,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Form Pendaftaran Antrian Baru oleh Pasien
+     * Form Pendaftaran Antrian Baru oleh Pasien (Atomic Concurrency Protected)
      */
     public function storeQueue(Request $request): RedirectResponse
     {
@@ -116,7 +118,7 @@ class DashboardController extends Controller
         $existing = Queue::where('user_id', $user->id)
             ->where('poli_id', $poli->id)
             ->whereDate('visit_date', $visitDate)
-            ->whereIn('status', ['waiting', 'in_progress'])
+            ->whereIn('status', ['waiting', 'in_progress', 'skipped'])
             ->first();
 
         if ($existing) {
@@ -125,29 +127,44 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Cek kuota harian
-        $todayCount = Queue::where('poli_id', $poli->id)
-            ->whereDate('visit_date', $visitDate)
-            ->count();
+        try {
+            $queue = DB::transaction(function () use ($user, $poli, $visitDate, $validated) {
+                // Kuota aktif dihitung hanya dari antrian yang tidak dibatalkan (dengan lock)
+                $activeCount = Queue::where('poli_id', $poli->id)
+                    ->whereDate('visit_date', $visitDate)
+                    ->where('status', '!=', 'cancelled')
+                    ->lockForUpdate()
+                    ->count();
 
-        if ($todayCount >= $poli->daily_quota) {
-            return back()->withErrors([
-                'queue' => "Mohon maaf, kuota antrian {$poli->name} untuk tanggal ini sudah penuh ({$poli->daily_quota} pasien).",
-            ]);
+                if ($activeCount >= $poli->daily_quota) {
+                    throw new \RuntimeException("Mohon maaf, kuota antrian {$poli->name} untuk tanggal ini sudah penuh ({$poli->daily_quota} pasien).");
+                }
+
+                // Ambil nomor antrian tertinggi yang pernah diterbitkan pada tanggal tersebut
+                $lastQueue = Queue::where('poli_id', $poli->id)
+                    ->whereDate('visit_date', $visitDate)
+                    ->lockForUpdate()
+                    ->orderByDesc('queue_number')
+                    ->first();
+
+                $nextNumber = $lastQueue ? ($lastQueue->queue_number + 1) : 1;
+                $queueCode = $poli->code_prefix . '-' . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+
+                return Queue::create([
+                    'user_id' => $user->id,
+                    'poli_id' => $poli->id,
+                    'queue_code' => $queueCode,
+                    'queue_number' => $nextNumber,
+                    'visit_date' => $visitDate,
+                    'complaint' => $validated['complaint'],
+                    'status' => 'waiting',
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['queue' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            return back()->withErrors(['queue' => 'Terjadi kendala saat menerbitkan nomor antrian. Silakan coba kembali.']);
         }
-
-        $nextNumber = $todayCount + 1;
-        $queueCode = $poli->code_prefix . '-' . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
-
-        $queue = Queue::create([
-            'user_id' => $user->id,
-            'poli_id' => $poli->id,
-            'queue_code' => $queueCode,
-            'queue_number' => $nextNumber,
-            'visit_date' => $visitDate,
-            'complaint' => $validated['complaint'],
-            'status' => 'waiting',
-        ]);
 
         return redirect()->route('user')->with('success', "Nomor antrian berhasil diterbitkan! Nomor Anda: {$queue->queue_code} di {$poli->name}.");
     }
