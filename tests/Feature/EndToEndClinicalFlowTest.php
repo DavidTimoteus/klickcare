@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Poli;
 use App\Models\Queue;
 use App\Models\User;
+use Database\Seeders\MedicineSeeder;
 use Database\Seeders\PoliSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +18,7 @@ class EndToEndClinicalFlowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([UserSeeder::class, PoliSeeder::class]);
+        $this->seed([UserSeeder::class, PoliSeeder::class, MedicineSeeder::class]);
     }
 
     /**
