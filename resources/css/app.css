@@ -328,6 +328,32 @@ h1, h2, h3, h4, h5, h6, .display-font {
     opacity: 1;
 }
 
+/* Spotlight Card Layout when single service is selected */
+.kc-poli-card.kc-poli-card-spotlight {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 16px 32px -4px rgba(15, 23, 42, 0.12);
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kc-poli-card.kc-poli-card-spotlight .kc-poli-icon-wrapper {
+    width: 64px;
+    height: 64px;
+}
+
+.kc-poli-card.kc-poli-card-spotlight .kc-poli-icon-wrapper img {
+    height: 38px;
+}
+
+.kc-poli-card.kc-poli-card-spotlight .kc-poli-title {
+    font-size: 1.4rem;
+}
+
+.kc-poli-card.kc-poli-card-spotlight .kc-poli-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
 .kc-poli-card-top {
     flex: 1 1 auto;
     display: flex;
@@ -518,13 +544,13 @@ h1, h2, h3, h4, h5, h6, .display-font {
     opacity: 1;
 }
 
-/* Interactive Table Row Hover Micro-Transition */
+/* Interactive Table Row Hover Micro-Transition (Zero-Shift for Stacking Context Safety) */
 .table-hover tbody tr {
-    transition: background-color 0.18s ease, transform 0.18s ease;
+    transition: background-color 0.15s ease;
 }
 
 .table-hover tbody tr:hover {
-    transform: translateX(3px);
+    background-color: rgba(241, 245, 249, 0.75) !important;
 }
 
 /* ---------------------------------------------------
@@ -777,4 +803,189 @@ h1, h2, h3, h4, h5, h6, .display-font {
     to {
         width: 0%;
     }
+}
+
+/* ---------------------------------------------------
+   CUSTOM CLINICAL FORM CONTROLS & FIELD STYLING
+   High-Aesthetic, Modern Precision (Non-Template UI)
+----------------------------------------------------- */
+
+/* Custom styled dropdown select */
+.form-select {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.55rem 2.25rem 0.55rem 0.85rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background-color: #f8fafc;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%232563eb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 14px 10px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.form-select:hover {
+    border-color: #93c5fd;
+    background-color: #ffffff;
+}
+
+.form-select:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.14);
+    outline: none;
+}
+
+/* Custom styled inputs & textareas */
+.form-control {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background-color: #f8fafc;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.form-control:hover {
+    border-color: #93c5fd;
+    background-color: #ffffff;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.14);
+    outline: none;
+}
+
+/* Stylized Date Picker Input with custom indicator */
+input[type="date"].form-control {
+    position: relative;
+    font-family: var(--kc-font-mono);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232563eb' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z'/%3E%3C/svg%3E");
+    padding: 4px;
+    border-radius: 6px;
+    transition: transform 0.18s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    transform: scale(1.15);
+}
+
+/* Interactive Date Helper Chips */
+.kc-quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.kc-quick-chip:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.kc-quick-chip.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+/* Interactive Visual Poli Selector Cards */
+.kc-poli-radio-card {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.85rem;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.kc-poli-radio-card:hover {
+    border-color: #93c5fd;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+.kc-poli-radio-card.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2), 0 4px 14px -2px rgba(37, 99, 235, 0.15);
+}
+
+.kc-poli-radio-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.kc-poli-radio-card.selected .kc-poli-radio-check {
+    border-color: #2563eb;
+    background: #2563eb;
+}
+
+.kc-poli-radio-card.selected .kc-poli-radio-check::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+/* Symptom Quick Helper Tags */
+.kc-symptom-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.kc-symptom-tag:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    border-style: solid;
+    color: #1d4ed8;
+    transform: translateY(-1px);
 }

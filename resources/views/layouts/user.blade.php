@@ -152,32 +152,107 @@
                         <p class="text-secondary small mb-0">Pilih poli tujuan dan tuliskan keluhan medis Anda secara ringkas.</p>
                     </div>
 
-                    <form action="{{ route('queue.store') }}" method="POST">
+                    <form action="{{ route('queue.store') }}" method="POST" id="queueBookingForm">
                         @csrf
 
+                        {{-- 1. Visual Poli Selector Cards --}}
                         <div class="mb-3">
-                            <label for="poli_id" class="form-label small fw-bold text-secondary">Pilih Poliklinik Spesialis</label>
-                            <select class="form-select @error('poli_id') is-invalid @enderror" id="poli_id" name="poli_id" required>
-                                <option value="" disabled selected>-- Pilih Layanan Poli --</option>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label small fw-bold text-secondary mb-0">
+                                    <i class="bi bi-hospital text-primary me-1"></i> Pilih Poliklinik Tujuan <span class="text-danger">*</span>
+                                </label>
+                                <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">Pilih salah satu layanan</span>
+                            </div>
+
+                            {{-- Hidden Native Select for 100% standard form submission & validation --}}
+                            <select class="form-select d-none @error('poli_id') is-invalid @enderror" id="poli_id" name="poli_id" required>
+                                <option value="" disabled {{ old('poli_id') ? '' : 'selected' }}>-- Pilih Layanan Poli --</option>
                                 @foreach ($polies as $p)
                                     <option value="{{ $p->id }}" {{ old('poli_id') == $p->id ? 'selected' : '' }}>
-                                        {{ $p->name }} (Dokter: {{ $p->doctor_name }}) — Sisa Kuota: {{ $p->remainingQuotaToday() }}
+                                        {{ $p->name }}
                                     </option>
                                 @endforeach
                             </select>
+
+                            {{-- Interactive 2x2 Grid Selection --}}
+                            <div class="row g-2" id="poliSelectionGrid">
+                                @foreach ($polies as $p)
+                                    <div class="col-sm-6">
+                                        <div class="kc-poli-radio-card {{ old('poli_id') == $p->id ? 'selected' : '' }}" data-poli-id="{{ $p->id }}" role="button">
+                                            <div class="d-flex align-items-start justify-content-between mb-2">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset($p->icon_path) }}" alt="{{ $p->name }}" height="26" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                                    <div>
+                                                        <div class="fw-bold text-dark small" style="font-size: 0.875rem;">{{ $p->name }}</div>
+                                                        <div class="text-muted" style="font-size: 0.7rem;">{{ $p->room }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="kc-poli-radio-check"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center pt-1 border-top small" style="font-size: 0.725rem;">
+                                                <span class="text-truncate text-secondary" style="max-width: 110px;">{{ $p->doctor_name }}</span>
+                                                <span class="mono-num fw-bold {{ $p->remainingQuotaToday() > 0 ? 'text-success' : 'text-danger' }}">
+                                                    {{ $p->remainingQuotaToday() }} / {{ $p->daily_quota }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('poli_id')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
+                        {{-- 2. Stylized Date Picker & Quick Action Chips --}}
                         <div class="mb-3">
-                            <label for="visit_date" class="form-label small fw-bold text-secondary">Tanggal Kunjungan</label>
-                            <input type="date" class="form-control" id="visit_date" name="visit_date" 
-                                   value="{{ old('visit_date', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" required>
+                            <label for="visit_date" class="form-label small fw-bold text-secondary mb-1">
+                                <i class="bi bi-calendar-event text-primary me-1"></i> Tanggal Kunjungan <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-primary border-end-0"><i class="bi bi-calendar-check"></i></span>
+                                <input type="date" class="form-control border-start-0 @error('visit_date') is-invalid @enderror" id="visit_date" name="visit_date" 
+                                       value="{{ old('visit_date', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" required>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button type="button" class="kc-quick-chip active" id="chipToday">
+                                    <i class="bi bi-calendar-check"></i> Hari Ini ({{ now()->translatedFormat('d M') }})
+                                </button>
+                                <button type="button" class="kc-quick-chip" id="chipTomorrow">
+                                    <i class="bi bi-calendar-plus"></i> Besok ({{ now()->addDay()->translatedFormat('d M') }})
+                                </button>
+                            </div>
+                            @error('visit_date')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
+                        {{-- 3. Enhanced Complaint Field with Quick Symptom Tags --}}
                         <div class="mb-4">
-                            <label for="complaint" class="form-label small fw-bold text-secondary">Keluhan Utama / Alasan Kunjungan</label>
-                            <textarea class="form-control @error('complaint') is-invalid @enderror" id="complaint" name="complaint" rows="3" 
-                                      placeholder="Jelaskan secara singkat gejala atau keluhan kesehatan yang dirasakan (contoh: demam, flu, batuk, pusing, nyeri gigi)" required>{{ old('complaint') }}</textarea>
-                            <div class="form-text small">Informasi keluhan ini akan langsung diterima dokter pemeriksa di poliklinik.</div>
+                            <label for="complaint" class="form-label small fw-bold text-secondary mb-1">
+                                <i class="bi bi-chat-heart text-primary me-1"></i> Keluhan Utama & Alasan Kunjungan <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted align-items-start pt-2 border-end-0"><i class="bi bi-pencil"></i></span>
+                                <textarea class="form-control border-start-0 @error('complaint') is-invalid @enderror" id="complaint" name="complaint" rows="3" 
+                                          placeholder="Jelaskan secara singkat gejala kesehatan yang dirasakan..." required>{{ old('complaint') }}</textarea>
+                            </div>
+                            
+                            {{-- Quick Symptom Suggestions --}}
+                            <div class="mt-2">
+                                <small class="text-muted d-block mb-1" style="font-size: 0.725rem;">Klik untuk menambahkan gejala umum:</small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <span class="kc-symptom-tag" data-tag="Demam dan pusing">+ Demam & Pusing</span>
+                                    <span class="kc-symptom-tag" data-tag="Batuk, flu dan sakit tenggorokan">+ Flu & Batuk</span>
+                                    <span class="kc-symptom-tag" data-tag="Nyeri sakit gigi dan gusi">+ Sakit Gigi</span>
+                                    <span class="kc-symptom-tag" data-tag="Mata perih, merah dan iritasi">+ Iritasi Mata</span>
+                                    <span class="kc-symptom-tag" data-tag="Nyeri perut / lambung (maag)">+ Sakit Perut</span>
+                                    <span class="kc-symptom-tag" data-tag="Konsultasi pola makan dan gizi">+ Konsultasi Gizi</span>
+                                </div>
+                            </div>
+                            @error('complaint')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <button type="submit" class="btn btn-kc-primary w-100 py-2 fw-bold shadow-sm">
@@ -358,5 +433,81 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Visual Poli Radio Grid Selection
+            const selectEl = document.getElementById('poli_id');
+            const radioCards = document.querySelectorAll('.kc-poli-radio-card');
+
+            radioCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const poliId = card.getAttribute('data-poli-id');
+                    radioCards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    if (selectEl) {
+                        selectEl.value = poliId;
+                    }
+                });
+            });
+
+            // If select already has a value on page load (e.g. from validation error old input)
+            if (selectEl && selectEl.value) {
+                const preselectedCard = document.querySelector(`.kc-poli-radio-card[data-poli-id="${selectEl.value}"]`);
+                if (preselectedCard) {
+                    radioCards.forEach(c => c.classList.remove('selected'));
+                    preselectedCard.classList.add('selected');
+                }
+            }
+
+            // 2. Quick Date Chips
+            const dateInput = document.getElementById('visit_date');
+            const chipToday = document.getElementById('chipToday');
+            const chipTomorrow = document.getElementById('chipTomorrow');
+
+            function formatDate(d) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            if (chipToday && dateInput) {
+                chipToday.addEventListener('click', () => {
+                    const today = new Date();
+                    dateInput.value = formatDate(today);
+                    chipToday.classList.add('active');
+                    if (chipTomorrow) chipTomorrow.classList.remove('active');
+                });
+            }
+
+            if (chipTomorrow && dateInput) {
+                chipTomorrow.addEventListener('click', () => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    dateInput.value = formatDate(tomorrow);
+                    chipTomorrow.classList.add('active');
+                    if (chipToday) chipToday.classList.remove('active');
+                });
+            }
+
+            // 3. Quick Symptom Tags
+            const complaintTextarea = document.getElementById('complaint');
+            const symptomTags = document.querySelectorAll('.kc-symptom-tag');
+
+            symptomTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    const symptom = tag.getAttribute('data-tag');
+                    if (!complaintTextarea || !symptom) return;
+                    const currentVal = complaintTextarea.value.trim();
+                    if (!currentVal) {
+                        complaintTextarea.value = symptom;
+                    } else if (!currentVal.toLowerCase().includes(symptom.toLowerCase())) {
+                        complaintTextarea.value = currentVal + ', ' + symptom;
+                    }
+                    complaintTextarea.focus();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

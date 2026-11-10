@@ -266,6 +266,13 @@
                                                                     </label>
                                                                     <input type="text" class="form-control form-control-sm" id="diagnosis_{{ $q->id }}" name="diagnosis" 
                                                                            placeholder="Contoh: ISPA / Pharyngitis Akut / Cephalea Tension" required>
+                                                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                                                        <span class="kc-symptom-tag" onclick="document.getElementById('diagnosis_{{ $q->id }}').value='Faringitis Akut'">Faringitis</span>
+                                                                        <span class="kc-symptom-tag" onclick="document.getElementById('diagnosis_{{ $q->id }}').value='ISPA (Infeksi Saluran Pernapasan Akut)'">ISPA</span>
+                                                                        <span class="kc-symptom-tag" onclick="document.getElementById('diagnosis_{{ $q->id }}').value='Cephalea (Sakit Kepala Tegang)'">Cephalea</span>
+                                                                        <span class="kc-symptom-tag" onclick="document.getElementById('diagnosis_{{ $q->id }}').value='Sindrom Dispepsia (Maag Akut)'">Dispepsia</span>
+                                                                        <span class="kc-symptom-tag" onclick="document.getElementById('diagnosis_{{ $q->id }}').value='Gingivitis / Pulpitis Reversibel'">Gigi</span>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="col-md-5">
                                                                     <label for="symptoms_{{ $q->id }}" class="form-label small fw-bold">
