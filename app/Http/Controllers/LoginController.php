@@ -79,7 +79,14 @@ class LoginController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'noId' => ['required', 'string', 'max:30', 'unique:tbl_users,noId'],
-            'email' => ['required', 'string', 'email', 'max:100', 'unique:tbl_users,email'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:100',
+                'unique:tbl_users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9.-]+\.)?polinema\.ac\.id$/i',
+            ],
             'password' => ['required', 'string', 'confirmed', Password::min(6)],
             'role' => ['required', 'in:2,3'], // 2 = Dosen/Pegawai, 3 = Mahasiswa
             'gender' => ['nullable', 'in:Laki-Laki,Perempuan'],
@@ -91,6 +98,7 @@ class LoginController extends Controller
             'email.required' => 'Email kampus wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
+            'email.regex' => 'Pendaftaran dibatasi khusus civitas akademika Polinema (harus menggunakan email @student.polinema.ac.id atau @polinema.ac.id).',
             'password.required' => 'Kata sandi wajib diisi.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
             'password.min' => 'Kata sandi minimal 6 karakter.',

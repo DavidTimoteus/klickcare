@@ -43,9 +43,10 @@
             </div>
 
             <div class="kc-form-group">
-                <label for="email" class="kc-form-label">Email Kampus</label>
+                <label for="email" class="kc-form-label">Email Kampus Polinema</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" 
                        id="email" name="email" value="{{ old('email') }}" placeholder="contoh: nama@student.polinema.ac.id" required>
+                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Gunakan email resmi berakhiran @student.polinema.ac.id atau @polinema.ac.id</small>
             </div>
 
             <div class="row g-2 mb-3">
