@@ -50,19 +50,19 @@
                         </li>
                     @endif
 
-                    <li class="nav-item ms-lg-2 my-2 my-lg-0">
+                    <li class="nav-item ms-lg-2 my-2 my-lg-0 flex-shrink-0">
                         <div class="kc-user-pill">
                             <span class="kc-user-avatar">
                                 <i class="bi bi-person-fill text-primary"></i>
                             </span>
-                            <span class="kc-user-name" title="{{ Auth::user()->name }}">{{ Auth::user()->name }}</span>
-                            <span class="badge {{ Auth::user()->isAdmin() ? 'bg-primary text-white' : 'bg-light text-secondary border' }}" style="font-size: 0.675rem;">
-                                {{ Auth::user()->role_label }}
+                            <span class="kc-user-name" title="{{ Auth::user()->name }}">{{ Auth::user()->display_name }}</span>
+                            <span class="badge {{ Auth::user()->isAdmin() ? 'bg-primary text-white' : 'bg-light text-secondary border' }}" style="font-size: 0.7rem; font-weight: 600;">
+                                {{ Auth::user()->role_badge_label }}
                             </span>
                         </div>
                     </li>
 
-                    <li class="nav-item ms-lg-2 my-1 my-lg-0">
+                    <li class="nav-item ms-lg-2 my-1 my-lg-0 flex-shrink-0">
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline m-0">
                             @csrf
                             <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-1 fw-semibold w-100 w-lg-auto" title="Keluar">

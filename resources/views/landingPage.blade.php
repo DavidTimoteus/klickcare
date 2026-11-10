@@ -154,72 +154,128 @@
                 <p class="text-secondary">Setiap poli didukung oleh tenaga dokter spesialis bersertifikasi serta peralatan klinis lengkap untuk melayani mahasiswa dan staf.</p>
             </div>
 
-            {{-- Interactive Category Filter Tabs --}}
-            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3" id="poliFilterTabs">
-                <button type="button" class="btn btn-sm kc-filter-pill active" data-filter="all">
-                    <i class="bi bi-grid-fill me-1"></i> Semua Poli ({{ $polies->count() }})
-                </button>
+            {{-- Interactive Category Filter Tabs (Bootstrap Nav-Pills) --}}
+            <ul class="nav nav-pills justify-content-center gap-2 mb-4" id="poliFilterTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="btn btn-sm kc-filter-pill active" id="tab-all-poli" data-bs-toggle="pill" data-bs-target="#pane-all-poli" role="tab" aria-controls="pane-all-poli" aria-selected="true">
+                        <i class="bi bi-grid-fill me-1"></i> Semua Poli ({{ $polies->count() }})
+                    </button>
+                </li>
                 @foreach ($polies as $p)
-                    <button type="button" class="btn btn-sm kc-filter-pill" data-filter="{{ $p->slug }}" data-poli-name="{{ $p->name }}">
-                        <img src="{{ asset($p->icon_path) }}" height="15" class="me-1" onerror="this.style.display='none'">
-                        {{ $p->name }}
-                    </button>
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="btn btn-sm kc-filter-pill" id="tab-poli-{{ $p->slug }}" data-bs-toggle="pill" data-bs-target="#pane-poli-{{ $p->slug }}" role="tab" aria-controls="pane-poli-{{ $p->slug }}" aria-selected="false">
+                            <img src="{{ asset($p->icon_path) }}" height="15" class="me-1" onerror="this.style.display='none'">
+                            {{ $p->name }}
+                        </button>
+                    </li>
                 @endforeach
-            </div>
+            </ul>
 
-            <div id="poliFilterNotice" class="text-center mb-4 d-none">
-                <span class="badge bg-light text-secondary border px-3 py-2 fw-medium shadow-xs">
-                    <i class="bi bi-info-circle text-primary me-1"></i>
-                    Fokus Layanan: <strong class="text-dark" id="poliFilterNoticeName">Layanan</strong> &bull;
-                    <button type="button" class="btn btn-link btn-sm p-0 ms-1 fw-bold text-primary text-decoration-none" id="btnResetPoliFilter">
-                        Tampilkan Semua Poli ({{ $polies->count() }}) &rarr;
-                    </button>
-                </span>
-            </div>
+            <div class="tab-content kc-tabs-container" id="poliCardsTabContent">
+                {{-- Tab Pane 1: Semua Poli (Grid 4 Kolom) --}}
+                <div class="tab-pane fade show active" id="pane-all-poli" role="tabpanel" aria-labelledby="tab-all-poli" tabindex="0">
+                    <div class="row g-4 justify-content-center">
+                        @foreach ($polies as $poli)
+                            <div class="col-md-6 col-lg-3">
+                                <div class="kc-poli-card h-100">
+                                    <div class="kc-poli-card-top">
+                                        <div class="kc-poli-header">
+                                            <div class="kc-poli-icon-wrapper">
+                                                <img src="{{ asset($poli->icon_path) }}" alt="{{ $poli->name }}" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                            </div>
+                                            <div class="kc-poli-header-info">
+                                                <h5 class="kc-poli-title">{{ $poli->name }}</h5>
+                                                <span class="badge bg-light text-primary border fw-semibold">
+                                                    Kode: {{ $poli->code_prefix }}
+                                                </span>
+                                            </div>
+                                        </div>
 
-            <div class="row g-4 justify-content-center" id="poliCardsRow">
-                @foreach ($polies as $poli)
-                    <div class="col-md-6 col-lg-3 poli-card-col" data-poli-slug="{{ $poli->slug }}">
-                        <div class="kc-poli-card">
-                            <div class="kc-poli-card-top">
-                                <div class="kc-poli-header">
-                                    <div class="kc-poli-icon-wrapper">
-                                        <img src="{{ asset($poli->icon_path) }}" alt="{{ $poli->name }}" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                        <p class="kc-poli-desc" title="{{ $poli->description }}">
+                                            {{ $poli->description }}
+                                        </p>
                                     </div>
-                                    <div class="kc-poli-header-info">
-                                        <h5 class="kc-poli-title">{{ $poli->name }}</h5>
-                                        <span class="badge bg-light text-primary border fw-semibold">
-                                            Kode: {{ $poli->code_prefix }}
-                                        </span>
+
+                                    <div class="kc-poli-card-bottom">
+                                        <div class="kc-poli-meta">
+                                            <div class="d-flex align-items-center gap-1 mb-1 kc-poli-doc-row" title="{{ $poli->doctor_name }}">
+                                                <i class="bi bi-person-badge-fill text-primary flex-shrink-0"></i>
+                                                <span class="fw-semibold text-dark text-truncate">{{ $poli->doctor_name }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-1 text-secondary mb-1">
+                                                <i class="bi bi-clock-fill text-muted flex-shrink-0"></i>
+                                                <span>{{ $poli->open_time }} - {{ $poli->close_time }} WIB</span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2">
+                                                <span class="text-secondary small">Sisa Kuota:</span>
+                                                <span class="mono-num fw-bold text-success fs-6">{{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <a href="{{ route('poli.detail', $poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold rounded-3 d-flex align-items-center justify-content-center gap-1">
+                                                <span>Lihat Jadwal & Antrian</span>
+                                                <i class="bi bi-arrow-right"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <p class="kc-poli-desc" title="{{ $poli->description }}">
-                                    {{ $poli->description }}
-                                </p>
                             </div>
+                        @endforeach
+                    </div>
+                </div>
 
-                            <div class="kc-poli-card-bottom">
-                                <div class="kc-poli-meta">
-                                    <div class="d-flex align-items-center gap-1 mb-1 kc-poli-doc-row" title="{{ $poli->doctor_name }}">
-                                        <i class="bi bi-person-badge-fill text-primary flex-shrink-0"></i>
-                                        <span class="fw-semibold text-dark text-truncate">{{ $poli->doctor_name }}</span>
+                {{-- Tab Panes 2..N: Tiap Poli (Spotlight Showcase Centered) --}}
+                @foreach ($polies as $poli)
+                    <div class="tab-pane fade" id="pane-poli-{{ $poli->slug }}" role="tabpanel" aria-labelledby="tab-poli-{{ $poli->slug }}" tabindex="0">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 col-xl-7">
+                                <div class="kc-spotlight-card border rounded-4 bg-white p-4 p-md-5 shadow-sm">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="kc-poli-icon-wrapper" style="width: 52px; height: 52px;">
+                                                <img src="{{ asset($poli->icon_path) }}" alt="{{ $poli->name }}" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                            </div>
+                                            <div>
+                                                <h4 class="fw-bold text-dark mb-1">{{ $poli->name }}</h4>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">Kode: {{ $poli->code_prefix }}</span>
+                                                    <span class="badge bg-light text-secondary border"><i class="bi bi-geo-alt me-1"></i>{{ $poli->room }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Sisa Kuota: {{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-1 text-secondary mb-1">
-                                        <i class="bi bi-clock-fill text-muted flex-shrink-0"></i>
-                                        <span>{{ $poli->open_time }} - {{ $poli->close_time }} WIB</span>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2">
-                                        <span class="text-secondary small">Sisa Kuota:</span>
-                                        <span class="mono-num fw-bold text-success fs-6">{{ $poli->remainingQuotaToday() }} / {{ $poli->daily_quota }}</span>
-                                    </div>
-                                </div>
 
-                                <div class="mt-3">
-                                    <a href="{{ route('poli.detail', $poli->slug) }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold rounded-3 d-flex align-items-center justify-content-center gap-1">
-                                        <span>Lihat Jadwal & Antrian</span>
-                                        <i class="bi bi-arrow-right"></i>
-                                    </a>
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-dark mb-2">Deskripsi Pelayanan Medis:</h6>
+                                        <p class="text-secondary leading-relaxed mb-0">{{ $poli->description }}</p>
+                                    </div>
+
+                                    <div class="row g-3 p-3 bg-light rounded-3 mb-4">
+                                        <div class="col-sm-6">
+                                            <div class="small text-muted mb-1"><i class="bi bi-person-badge text-primary me-1"></i> DPJP (Dokter Spesialis):</div>
+                                            <div class="fw-bold text-dark">{{ $poli->doctor_name }}</div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="small text-muted mb-1"><i class="bi bi-clock-history text-primary me-1"></i> Jam Buka Pelayanan:</div>
+                                            <div class="fw-bold text-dark">{{ $poli->open_time }} - {{ $poli->close_time }} WIB</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center pt-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3" onclick="document.getElementById('tab-all-poli').click();">
+                                            <i class="bi bi-grid me-1"></i> Semua Poli
+                                        </button>
+                                        <a href="{{ route('poli.detail', $poli->slug) }}" class="btn btn-primary btn-sm rounded-3 px-4 fw-semibold shadow-xs">
+                                            <span>Jadwal Lengkap & Ambil Antrian {{ $poli->name }}</span>
+                                            <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

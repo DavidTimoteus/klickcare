@@ -61,80 +61,26 @@ function animateNumber(element, start, end, duration) {
 }
 
 /**
- * 2. Interactive Poli Category Filter Tabs
- * Dynamically filters and highlights Poli cards with smooth opacity and scale transitions.
+ * 2. Interactive Poli Category Tabs (Silky-Smooth Cross-Fade Transition)
+ * Native Bootstrap Pill navigation enhanced with hardware-accelerated cubic-bezier transitions.
  */
 function initPoliFilterTabs() {
-    const filterPills = document.querySelectorAll('#poliFilterTabs .kc-filter-pill');
-    const cardCols = document.querySelectorAll('#poliCardsRow .poli-card-col');
-    const noticeEl = document.getElementById('poliFilterNotice');
-    const noticeNameEl = document.getElementById('poliFilterNoticeName');
-    const resetBtn = document.getElementById('btnResetPoliFilter');
-    if (!filterPills.length || !cardCols.length) return;
+    const tabs = document.querySelectorAll('#poliFilterTabs button[data-bs-toggle="pill"]');
+    if (!tabs.length) return;
 
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            const allPill = document.querySelector('#poliFilterTabs .kc-filter-pill[data-filter="all"]');
-            if (allPill) allPill.click();
-        });
-    }
-
-    filterPills.forEach(pill => {
-        pill.addEventListener('click', () => {
-            const filter = pill.getAttribute('data-filter');
-            const poliName = pill.getAttribute('data-poli-name') || '';
-
-            // Update active state on pills
-            filterPills.forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-
-            if (filter === 'all') {
-                if (noticeEl) noticeEl.classList.add('d-none');
-            } else {
-                if (noticeEl && noticeNameEl) {
-                    noticeNameEl.textContent = poliName;
-                    noticeEl.classList.remove('d-none');
-                }
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', (event) => {
+            const targetSelector = event.target.getAttribute('data-bs-target');
+            const targetPane = targetSelector ? document.querySelector(targetSelector) : null;
+            if (targetPane) {
+                targetPane.style.opacity = '0';
+                targetPane.style.transform = 'translateY(8px) scale(0.995)';
+                requestAnimationFrame(() => {
+                    targetPane.style.transition = 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+                    targetPane.style.opacity = '1';
+                    targetPane.style.transform = 'translateY(0) scale(1)';
+                });
             }
-
-            // Filter cards with smooth fade & responsive column scaling
-            cardCols.forEach(col => {
-                const slug = col.getAttribute('data-poli-slug');
-                const card = col.querySelector('.kc-poli-card');
-                if (filter === 'all' || slug === filter) {
-                    // Responsive column layout: 4 columns for all, centered spotlight column for single
-                    if (filter === 'all') {
-                        col.classList.remove('col-12', 'col-md-8', 'col-lg-6');
-                        col.classList.add('col-md-6', 'col-lg-3');
-                        if (card) card.classList.remove('kc-poli-card-spotlight');
-                    } else {
-                        col.classList.remove('col-md-6', 'col-lg-3');
-                        col.classList.add('col-12', 'col-md-8', 'col-lg-6');
-                        if (card) card.classList.add('kc-poli-card-spotlight');
-                    }
-
-                    col.style.display = 'block';
-                    col.style.opacity = '0';
-                    col.style.transform = 'translateY(10px) scale(0.98)';
-                    setTimeout(() => {
-                        col.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
-                        col.style.opacity = '1';
-                        col.style.transform = 'translateY(0) scale(1)';
-                        if (filter !== 'all' && card) {
-                            card.classList.remove('kc-spotlight');
-                            void card.offsetWidth; // trigger browser reflow
-                            card.classList.add('kc-spotlight');
-                        }
-                    }, 20);
-                } else {
-                    col.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                    col.style.opacity = '0';
-                    col.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        col.style.display = 'none';
-                    }, 200);
-                }
-            });
         });
     });
 }

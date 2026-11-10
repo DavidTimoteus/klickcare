@@ -68,17 +68,29 @@ html {
     color: #64748b;
 }
 
+@media (min-width: 992px) {
+    .kc-navbar .navbar-nav {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    .kc-navbar .nav-item {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
 .kc-nav-link {
     font-size: 0.88rem;
     font-weight: 600;
     color: #334155 !important;
-    padding: 0.45rem 0.75rem !important;
+    padding: 0.45rem 0.7rem !important;
     border-radius: 8px;
     transition: background-color 0.15s ease, color 0.15s ease;
     text-decoration: none;
-    white-space: nowrap;
-    display: inline-flex;
+    white-space: nowrap !important;
+    display: inline-flex !important;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .kc-nav-link:hover,
