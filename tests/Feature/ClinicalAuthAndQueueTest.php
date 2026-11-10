@@ -130,4 +130,124 @@ class ClinicalAuthAndQueueTest extends TestCase
         $this->assertEquals('completed', $queue->fresh()->status);
         $this->assertStringContainsString('Paracetamol', $queue->fresh()->doctor_notes);
     }
+
+    public function test_registration_rejects_non_campus_emails(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Intruder',
+            'noId' => '9999999999',
+            'role' => '3',
+            'email' => 'intruder@gmail.com', // Non-campus email
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+        $this->assertGuest();
+    }
+
+    public function test_single_active_in_progress_patient_enforced_per_poli(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        $poli = Poli::where('slug', 'poliumum')->first();
+
+        // Cari antrian pertama yang sedang in_progress
+        $firstQueue = Queue::where('poli_id', $poli->id)->where('status', 'in_progress')->first();
+        $this->assertNotNull($firstQueue);
+
+        // Buat antrian kedua di poli yang sama
+        $secondStudent = User::factory()->create([
+            'role' => User::ROLE_STUDENT,
+            'email' => 'secondstudent@student.polinema.ac.id',
+            'noId' => '2131700999',
+        ]);
+
+        $secondQueue = Queue::create([
+            'user_id' => $secondStudent->id,
+            'poli_id' => $poli->id,
+            'queue_code' => 'U-099',
+            'queue_number' => 99,
+            'visit_date' => today()->format('Y-m-d'),
+            'complaint' => 'Pusing kepala',
+            'status' => 'waiting',
+        ]);
+
+        // Coba panggil antrian kedua saat antrian pertama masih in_progress
+        $response = $this->actingAs($admin)->post("/admin/antrian/{$secondQueue->id}/status", [
+            'status' => 'in_progress',
+        ]);
+
+        // Harus ditolak dengan pesan error
+        $response->assertSessionHasErrors(['queue']);
+        $this->assertEquals('waiting', $secondQueue->fresh()->status);
+    }
+
+    public function test_queue_skipping_and_recall_lifecycle(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        $activeQueue = Queue::where('status', 'in_progress')->firstOrFail();
+
+        // 1. Dokter melewati pasien karena belum datang (skipped)
+        $this->actingAs($admin)->post("/admin/antrian/{$activeQueue->id}/status", [
+            'status' => 'skipped',
+        ])->assertSessionHas('success');
+
+        $this->assertEquals('skipped', $activeQueue->fresh()->status);
+
+        // 2. Dokter memanggil ulang pasien yang dilewati (recall to in_progress)
+        $this->actingAs($admin)->post("/admin/antrian/{$activeQueue->id}/status", [
+            'status' => 'in_progress',
+        ])->assertSessionHas('success');
+
+        $this->assertEquals('in_progress', $activeQueue->fresh()->status);
+    }
+
+    public function test_live_poli_status_api_endpoint(): void
+    {
+        $response = $this->getJson('/poli/poliumum/live-status');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'poli_name',
+            'room',
+            'remaining_quota',
+            'current_calling',
+            'waiting_count',
+            'skipped_count',
+            'queues',
+            'timestamp',
+        ]);
+        $response->assertJson(['poli_name' => 'Poli Umum']);
+    }
+
+    public function test_database_enforces_unique_daily_poli_queue_constraint(): void
+    {
+        $student = User::where('role', User::ROLE_STUDENT)->first();
+        $poli = Poli::where('slug', 'poliumum')->first();
+        $date = today()->format('Y-m-d');
+
+        // Buat antrian dengan nomor 88
+        Queue::create([
+            'user_id' => $student->id,
+            'poli_id' => $poli->id,
+            'queue_code' => 'U-088',
+            'queue_number' => 88,
+            'visit_date' => $date,
+            'complaint' => 'Keluhan pertama',
+            'status' => 'waiting',
+        ]);
+
+        // Coba masukkan antrian lain dengan nomor 88 pada tanggal dan poli yang sama
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        Queue::create([
+            'user_id' => $student->id,
+            'poli_id' => $poli->id,
+            'queue_code' => 'U-088',
+            'queue_number' => 88,
+            'visit_date' => $date,
+            'complaint' => 'Keluhan kedua duplikat',
+            'status' => 'waiting',
+        ]);
+    }
 }
