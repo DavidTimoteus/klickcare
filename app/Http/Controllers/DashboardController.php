@@ -319,10 +319,25 @@ class DashboardController extends Controller
 
     /**
      * Update Status Antrian, Rekam Medis & Pengurangan Stok Resep Obat (Atomic)
-     * Menegakkan aturan: 1 pasien aktif per poli, alur Lewati (Skipped), dan pengurangan stok otomatis
+     * Menegakkan aturan: 1 pasien aktif per poli, alur Lewati (Skipped), sanitasi resep aman, dan pengurangan stok otomatis
      */
     public function updateQueueStatus(Request $request, Queue $queue): RedirectResponse
     {
+        // Sanitasi input resep obat: Hanya simpan baris yang benar-benar memilih obat, buang baris kosong
+        if ($request->has('medicines') && is_array($request->medicines)) {
+            $cleanedMedicines = [];
+            foreach ($request->medicines as $item) {
+                if (is_array($item) && !empty($item['id'])) {
+                    $cleanedMedicines[] = [
+                        'id' => (int) $item['id'],
+                        'quantity' => (!empty($item['quantity']) && (int) $item['quantity'] > 0) ? (int) $item['quantity'] : 1,
+                        'dosage' => !empty($item['dosage']) ? trim((string) $item['dosage']) : 'Sesuai anjuran dokter (3x1 sesudah makan)',
+                    ];
+                }
+            }
+            $request->merge(['medicines' => $cleanedMedicines]);
+        }
+
         $validated = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,skipped,completed,cancelled'],
             'doctor_notes' => ['nullable', 'string', 'max:1000'],
@@ -339,9 +354,14 @@ class DashboardController extends Controller
             'physical_exam' => ['nullable', 'string', 'max:1000'],
             'follow_up_advice' => ['nullable', 'string', 'max:1000'],
             'medicines' => ['nullable', 'array'],
-            'medicines.*.id' => ['required_with:medicines', 'exists:tbl_medicines,id'],
-            'medicines.*.quantity' => ['required_with:medicines', 'integer', 'min:1'],
-            'medicines.*.dosage' => ['required_with:medicines', 'string', 'max:100'],
+            'medicines.*.id' => ['required', 'exists:tbl_medicines,id'],
+            'medicines.*.quantity' => ['required', 'integer', 'min:1'],
+            'medicines.*.dosage' => ['required', 'string', 'max:100'],
+        ], [
+            'status.required' => 'Status pelayanan wajib dipilih.',
+            'diagnosis.required' => 'Diagnosis klinis wajib diisi.',
+            'medicines.*.id.exists' => 'Obat yang dipilih tidak terdaftar di sistem farmasi.',
+            'medicines.*.quantity.min' => 'Jumlah obat pada resep minimal 1.',
         ]);
 
         // Aturan Integritas Medis: Hanya boleh ada 1 pasien berstatus in_progress per poli pada tanggal kunjungan
@@ -532,5 +552,32 @@ class DashboardController extends Controller
         $medicine = Medicine::create($validated);
 
         return back()->with('success', "Obat {$medicine->name} ({$medicine->code}) berhasil didaftarkan ke katalog farmasi.");
+    }
+
+    /**
+     * Manajemen Perubahan Dokter & Pengaturan Operasional Poliklinik oleh Admin
+     */
+    public function updatePoli(Request $request, Poli $poli): RedirectResponse
+    {
+        $validated = $request->validate([
+            'doctor_name' => ['required', 'string', 'max:255'],
+            'room' => ['required', 'string', 'max:255'],
+            'open_time' => ['required', 'string'],
+            'close_time' => ['required', 'string'],
+            'daily_quota' => ['required', 'integer', 'min:1', 'max:500'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_active' => ['nullable'],
+        ], [
+            'doctor_name.required' => 'Nama dokter DPJP wajib diisi.',
+            'room.required' => 'Ruangan poliklinik wajib diisi.',
+            'daily_quota.required' => 'Kuota harian antrian wajib diisi.',
+            'daily_quota.min' => 'Kuota minimal 1 pasien.',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        $poli->update($validated);
+
+        return back()->with('success', "Data operasional dan tenaga medis {$poli->name} (Dokter: {$poli->doctor_name}) berhasil diperbarui!");
     }
 }

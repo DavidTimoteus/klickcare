@@ -250,4 +250,55 @@ class ClinicalAuthAndQueueTest extends TestCase
             'status' => 'waiting',
         ]);
     }
+
+    public function test_doctor_can_complete_examination_without_medicine_and_with_empty_inputs(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        $queue = Queue::where('status', 'waiting')->first();
+        $queue->update(['status' => 'in_progress']);
+
+        // Mengirimkan baris obat kosong seperti perilaku browser pada form
+        $response = $this->actingAs($admin)->post("/admin/antrian/{$queue->id}/status", [
+            'status' => 'completed',
+            'diagnosis' => 'Konsultasi Pola Hidup Sehat',
+            'icd10_code' => 'Z71.3',
+            'doctor_notes' => 'Edukasi diet seimbang dan minum air putih 2L/hari.',
+            'medicines' => [
+                ['id' => '', 'quantity' => '', 'dosage' => ''],
+                ['id' => '', 'quantity' => '', 'dosage' => ''],
+                ['id' => '', 'quantity' => '', 'dosage' => ''],
+            ],
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertSessionHas('success');
+        $this->assertEquals('completed', $queue->fresh()->status);
+        $this->assertNotNull($queue->fresh()->medicalRecord);
+        $this->assertEquals('Konsultasi Pola Hidup Sehat', $queue->fresh()->medicalRecord->diagnosis);
+    }
+
+    public function test_admin_can_update_doctor_and_poli_schedule(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        $poli = Poli::where('slug', 'poliumum')->first();
+
+        $response = $this->actingAs($admin)->post("/admin/poli/{$poli->id}/update", [
+            'doctor_name' => 'dr. Siti Rahmawati, Sp.PD (Dokter Pengganti)',
+            'room' => 'Gedung Graha Polinema Lt. 1 - Ruang 101B',
+            'open_time' => '07:30',
+            'close_time' => '14:00',
+            'daily_quota' => 50,
+            'description' => 'Pelayanan rawat jalan umum dan dokter pengganti shift pagi.',
+            'is_active' => '1',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertSessionHas('success');
+
+        $updated = $poli->fresh();
+        $this->assertEquals('dr. Siti Rahmawati, Sp.PD (Dokter Pengganti)', $updated->doctor_name);
+        $this->assertEquals(50, $updated->daily_quota);
+        $this->assertEquals('07:30', $updated->open_time);
+        $this->assertTrue($updated->is_active);
+    }
 }

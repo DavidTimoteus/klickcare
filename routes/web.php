@@ -40,4 +40,5 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('/admin/farmasi', [DashboardController::class, 'pharmacyIndex'])->name('admin.pharmacy');
     Route::post('/admin/farmasi/stok', [DashboardController::class, 'updateMedicineStock'])->name('admin.pharmacy.stock');
     Route::post('/admin/farmasi/obat', [DashboardController::class, 'storeMedicine'])->name('admin.pharmacy.store');
+    Route::post('/admin/poli/{poli}/update', [DashboardController::class, 'updatePoli'])->name('admin.poli.update');
 });

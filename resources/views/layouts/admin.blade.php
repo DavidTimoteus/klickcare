@@ -446,65 +446,70 @@
                                                     <span class="badge bg-light text-muted border" style="font-size: 0.675rem;">Stok Otomatis</span>
                                                 </div>
 
-                                                {{-- Prescription Item Row 1 --}}
-                                                <div class="row g-2 align-items-center mb-2">
-                                                    <div class="col-md-5">
-                                                        <select name="medicines[0][id]" class="form-select form-select-sm">
-                                                            <option value="">-- Pilih Obat 1 (Opsional) --</option>
-                                                            @foreach ($medicines as $med)
-                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
-                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                    <div class="alert alert-light border py-1 px-2 small text-muted mb-3 d-flex align-items-center gap-2">
+                                                        <i class="bi bi-info-circle text-primary flex-shrink-0"></i>
+                                                        <span><strong>Resep Bersifat Opsional:</strong> Kosongkan jika pasien hanya memerlukan konsultasi, edukasi, atau tindakan non-farmakoterapi.</span>
                                                     </div>
-                                                    <div class="col-md-2">
-                                                        <input type="number" name="medicines[0][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <input type="text" name="medicines[0][dosage]" class="form-control form-control-sm" placeholder="Aturan: 3x1 tablet sesudah makan">
-                                                    </div>
-                                                </div>
 
-                                                {{-- Prescription Item Row 2 --}}
-                                                <div class="row g-2 align-items-center mb-2">
-                                                    <div class="col-md-5">
-                                                        <select name="medicines[1][id]" class="form-select form-select-sm">
-                                                            <option value="">-- Pilih Obat 2 (Opsional) --</option>
-                                                            @foreach ($medicines as $med)
-                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
-                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                    {{-- Prescription Item Row 1 --}}
+                                                    <div class="row g-2 align-items-center mb-2">
+                                                        <div class="col-md-5">
+                                                            <select name="medicines[0][id]" class="form-select form-select-sm" onchange="autoFillPrescription(this, 'qty_{{ $q->id }}_0', 'dos_{{ $q->id }}_0')">
+                                                                <option value="">-- Tanpa Obat / Pilih Obat 1 --</option>
+                                                                @foreach ($medicines as $med)
+                                                                    <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                        {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="number" id="qty_{{ $q->id }}_0" name="medicines[0][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="text" id="dos_{{ $q->id }}_0" name="medicines[0][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / dosis">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-2">
-                                                        <input type="number" name="medicines[1][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <input type="text" name="medicines[1][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / dosis">
-                                                    </div>
-                                                </div>
 
-                                                {{-- Prescription Item Row 3 --}}
-                                                <div class="row g-2 align-items-center mb-3">
-                                                    <div class="col-md-5">
-                                                        <select name="medicines[2][id]" class="form-select form-select-sm">
-                                                            <option value="">-- Pilih Obat 3 (Opsional) --</option>
-                                                            @foreach ($medicines as $med)
-                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
-                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                    {{-- Prescription Item Row 2 --}}
+                                                    <div class="row g-2 align-items-center mb-2">
+                                                        <div class="col-md-5">
+                                                            <select name="medicines[1][id]" class="form-select form-select-sm" onchange="autoFillPrescription(this, 'qty_{{ $q->id }}_1', 'dos_{{ $q->id }}_1')">
+                                                                <option value="">-- Tanpa Obat / Pilih Obat 2 --</option>
+                                                                @foreach ($medicines as $med)
+                                                                    <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                        {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="number" id="qty_{{ $q->id }}_1" name="medicines[1][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="text" id="dos_{{ $q->id }}_1" name="medicines[1][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / dosis">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-2">
-                                                        <input type="number" name="medicines[2][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+
+                                                    {{-- Prescription Item Row 3 --}}
+                                                    <div class="row g-2 align-items-center mb-3">
+                                                        <div class="col-md-5">
+                                                            <select name="medicines[2][id]" class="form-select form-select-sm" onchange="autoFillPrescription(this, 'qty_{{ $q->id }}_2', 'dos_{{ $q->id }}_2')">
+                                                                <option value="">-- Tanpa Obat / Pilih Obat 3 --</option>
+                                                                @foreach ($medicines as $med)
+                                                                    <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                        {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="number" id="qty_{{ $q->id }}_2" name="medicines[2][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="text" id="dos_{{ $q->id }}_2" name="medicines[2][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / dosis">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-5">
-                                                        <input type="text" name="medicines[2][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / dosis">
-                                                    </div>
-                                                </div>
 
                                                 <div>
                                                     <label for="doctor_notes_{{ $q->id }}" class="form-label small fw-bold text-secondary mb-1">
@@ -690,22 +695,46 @@
             @endif
         @endforeach
 
-        {{-- Master Data Poliklinik & Dokter --}}
+        {{-- Master Data Poliklinik & Pengaturan Dokter Jaga (DPJP) --}}
         <div class="bg-white border rounded-4 shadow-sm p-4">
-            <h5 class="fw-bold mb-3">Status 4 Poliklinik Hari Ini</h5>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Status & Jadwal Dokter 4 Poliklinik</h5>
+                    <p class="text-secondary small mb-0">Kelola dokter penanggung jawab pelayanan (DPJP), jam buka/tutup, dan kuota pasien harian.</p>
+                </div>
+            </div>
             <div class="row g-3">
                 @foreach ($polies as $p)
                     <div class="col-md-6 col-lg-3">
-                        <div class="border rounded-3 p-3 bg-light">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <img src="{{ asset($p->icon_path) }}" alt="{{ $p->name }}" height="28" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
-                                <h6 class="fw-bold mb-0">{{ $p->name }}</h6>
+                        <div class="border rounded-3 p-3 bg-light h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{ asset($p->icon_path) }}" alt="{{ $p->name }}" height="26" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                        <h6 class="fw-bold mb-0 text-dark">{{ $p->name }}</h6>
+                                    </div>
+                                    <span class="badge {{ $p->is_active ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} border" style="font-size: 0.675rem;">
+                                        {{ $p->is_active ? 'Buka' : 'Libur' }}
+                                    </span>
+                                </div>
+                                <div class="small text-dark fw-semibold mb-1">
+                                    <i class="bi bi-person-fill text-primary me-1"></i> {{ $p->doctor_name }}
+                                </div>
+                                <div class="small text-muted mb-1">
+                                    <i class="bi bi-geo-alt me-1"></i> {{ $p->room }}
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-clock me-1"></i> {{ $p->open_time }} - {{ $p->close_time }} WIB
+                                </div>
                             </div>
-                            <div class="small text-muted mb-1"><i class="bi bi-person-fill text-primary me-1"></i> {{ $p->doctor_name }}</div>
-                            <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i> {{ $p->open_time }} - {{ $p->close_time }} WIB</div>
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2 small">
-                                <span>Sisa Kuota:</span>
-                                <span class="mono-num fw-bold text-primary">{{ $p->remainingQuotaToday() }} / {{ $p->daily_quota }}</span>
+                            <div class="border-top pt-2">
+                                <div class="d-flex justify-content-between align-items-center small mb-2">
+                                    <span class="text-muted">Sisa Kuota:</span>
+                                    <span class="mono-num fw-bold text-primary">{{ $p->remainingQuotaToday() }} / {{ $p->daily_quota }}</span>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm w-100 rounded-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#editPoliModal{{ $p->id }}" title="Atur Pergantian Dokter & Jadwal Layanan">
+                                    <i class="bi bi-pencil-square me-1"></i> Atur Dokter & Jadwal
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -714,6 +743,94 @@
         </div>
     </div>
 
+    {{-- Modals Pengaturan Tenaga Medis Dokter & Poliklinik (Admin Role 1) --}}
+    @foreach ($polies as $p)
+        <div class="modal fade" id="editPoliModal{{ $p->id }}" tabindex="-1" aria-labelledby="editPoliLabel{{ $p->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <form action="{{ route('admin.poli.update', $p->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-header bg-light border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{{ asset($p->icon_path) }}" alt="{{ $p->name }}" height="24" onerror="this.src='{{ asset('img/klickCare-logo.png') }}'">
+                                <h5 class="modal-title fw-bold text-dark mb-0" id="editPoliLabel{{ $p->id }}">
+                                    Atur Dokter & Operasional {{ $p->name }}
+                                </h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-start">
+                            <div class="mb-3">
+                                <label for="doc_{{ $p->id }}" class="form-label small fw-bold">Nama Dokter Jaga / DPJP <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="doc_{{ $p->id }}" name="doctor_name" value="{{ $p->doctor_name }}" required placeholder="Contoh: dr. H. Hendra Setiawan, Sp.PD atau dr. Pengganti">
+                                <small class="text-muted">Tuliskan nama lengkap beserta gelar dokter yang bertugas hari ini.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="room_{{ $p->id }}" class="form-label small fw-bold">Ruangan Pelayanan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="room_{{ $p->id }}" name="room" value="{{ $p->room }}" required>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label for="open_{{ $p->id }}" class="form-label small fw-bold">Jam Buka Layanan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm" id="open_{{ $p->id }}" name="open_time" value="{{ $p->open_time }}" required placeholder="08:00">
+                                </div>
+                                <div class="col-6">
+                                    <label for="close_{{ $p->id }}" class="form-label small fw-bold">Jam Tutup Layanan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm" id="close_{{ $p->id }}" name="close_time" value="{{ $p->close_time }}" required placeholder="15:30">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="quota_{{ $p->id }}" class="form-label small fw-bold">Batas Kuota Antrian Harian <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control" id="quota_{{ $p->id }}" name="daily_quota" value="{{ $p->daily_quota }}" min="1" max="500" required>
+                                    <span class="input-group-text bg-light text-muted">Pasien / Hari</span>
+                                </div>
+                                <small class="text-muted">Sesuaikan kapasitas kuota jika ada penambahan atau pembatasan dokter jaga.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="desc_{{ $p->id }}" class="form-label small fw-bold">Deskripsi Layanan Klinis</label>
+                                <textarea class="form-control form-control-sm" id="desc_{{ $p->id }}" name="description" rows="2">{{ $p->description }}</textarea>
+                            </div>
+
+                            <div class="form-check form-switch p-2 bg-light rounded-3 border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="active_{{ $p->id }}" name="is_active" value="1" {{ $p->is_active ? 'checked' : '' }}>
+                                <label class="form-check-label small fw-bold text-dark" for="active_{{ $p->id }}">
+                                    Layanan Poliklinik Buka & Menerima Antrian Pasien
+                                </label>
+                                <div class="small text-muted ps-4">Nonaktifkan jika poli sedang libur atau dokter berhalangan tanpa pengganti.</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light border-top">
+                            <button type="button" class="btn btn-secondary btn-sm rounded-3" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold rounded-3 shadow-xs">
+                                <i class="bi bi-save me-1"></i> Simpan Perubahan Dokter & Jadwal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function autoFillPrescription(selectEl, qtyInputId, dosInputId) {
+            const qtyInput = document.getElementById(qtyInputId);
+            const dosInput = document.getElementById(dosInputId);
+            if (!qtyInput || !dosInput) return;
+
+            if (selectEl.value) {
+                if (!qtyInput.value) qtyInput.value = 1;
+                if (!dosInput.value) dosInput.value = '3x1 tablet sesudah makan';
+            } else {
+                qtyInput.value = '';
+                dosInput.value = '';
+            }
+        }
+    </script>
 </body>
 </html>
