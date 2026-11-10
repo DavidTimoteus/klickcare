@@ -21,6 +21,9 @@ return new class extends Migration
             $table->date('birthDate')->nullable();
             $table->string('address', 255)->nullable();
             $table->string('phoneNumber', 30)->nullable();
+            $table->string('medical_record_number', 30)->nullable()->unique(); // Nomor Rekam Medis (No. RM) Unik Pasien Seumur Hidup (Permenkes 24/2022)
+            $table->string('allergies', 255)->nullable()->default('Tidak ada riwayat alergi obat'); // Riwayat Alergi Obat Pasien (Safety Alert)
+            $table->string('blood_type', 5)->nullable(); // Golongan Darah (A, B, AB, O)
             $table->unsignedSmallInteger('role')->default(3); // 1 = Admin/Petugas, 2 = Dosen/Pegawai, 3 = Mahasiswa
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

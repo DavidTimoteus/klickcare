@@ -19,12 +19,20 @@ class MedicalRecord extends Model
         'user_id',
         'poli_id',
         'doctor_name',
-        'diagnosis',
+        'doctor_sip',
         'symptoms',
+        'allergies_checked',
         'blood_pressure',
+        'heart_rate',
+        'respiratory_rate',
         'temperature',
         'weight',
+        'height',
+        'physical_exam',
+        'diagnosis',
+        'icd10_code',
         'treatment_notes',
+        'follow_up_advice',
     ];
 
     /**
@@ -34,6 +42,8 @@ class MedicalRecord extends Model
         'diagnosis' => 'encrypted',
         'symptoms' => 'encrypted',
         'treatment_notes' => 'encrypted',
+        'physical_exam' => 'encrypted',
+        'follow_up_advice' => 'encrypted',
     ];
 
     public function patient(): BelongsTo

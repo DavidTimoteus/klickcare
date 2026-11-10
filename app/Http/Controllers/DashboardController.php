@@ -276,8 +276,8 @@ class DashboardController extends Controller
         $completedCount = Queue::whereDate('visit_date', $todayDate)->where('status', 'completed')->count();
         $totalPatientsCount = User::whereIn('role', [User::ROLE_STAFF, User::ROLE_STUDENT])->count();
 
-        // Antrian hari ini dengan filter poli opsional
-        $queuesQuery = Queue::with(['user', 'poli'])
+        // Antrian hari ini dengan filter poli opsional & eager loaded RME
+        $queuesQuery = Queue::with(['user', 'poli', 'medicalRecord.prescriptions.medicine'])
             ->whereDate('visit_date', $todayDate);
 
         if ($selectedPoliId) {
@@ -327,10 +327,17 @@ class DashboardController extends Controller
             'status' => ['required', 'in:waiting,in_progress,skipped,completed,cancelled'],
             'doctor_notes' => ['nullable', 'string', 'max:1000'],
             'diagnosis' => ['nullable', 'string', 'max:500'],
+            'icd10_code' => ['nullable', 'string', 'max:20'],
             'symptoms' => ['nullable', 'string', 'max:500'],
+            'allergies_checked' => ['nullable', 'string', 'max:255'],
             'blood_pressure' => ['nullable', 'string', 'max:20'],
+            'heart_rate' => ['nullable', 'string', 'max:10'],
+            'respiratory_rate' => ['nullable', 'string', 'max:10'],
             'temperature' => ['nullable', 'string', 'max:10'],
             'weight' => ['nullable', 'string', 'max:10'],
+            'height' => ['nullable', 'string', 'max:10'],
+            'physical_exam' => ['nullable', 'string', 'max:1000'],
+            'follow_up_advice' => ['nullable', 'string', 'max:1000'],
             'medicines' => ['nullable', 'array'],
             'medicines.*.id' => ['required_with:medicines', 'exists:tbl_medicines,id'],
             'medicines.*.quantity' => ['required_with:medicines', 'integer', 'min:1'],
@@ -361,7 +368,7 @@ class DashboardController extends Controller
                     $diagnosisText = $validated['diagnosis'] ?? ($validated['doctor_notes'] ?? 'Pemeriksaan Klinis Rutin');
                     $treatmentNotes = $validated['doctor_notes'] ?? null;
 
-                    // Buat nomor rekam medis unik e.g. RM-202611-0001
+                    // Buat kode rekam medis kunjungan unik e.g. RM-202611-0001
                     $recordCount = MedicalRecord::count() + 1;
                     $recordCode = 'RM-' . date('Ym') . '-' . str_pad((string) $recordCount, 4, '0', STR_PAD_LEFT);
 
@@ -371,12 +378,20 @@ class DashboardController extends Controller
                         'user_id' => $queue->user_id,
                         'poli_id' => $queue->poli_id,
                         'doctor_name' => $queue->poli->doctor_name,
+                        'doctor_sip' => 'SIP.440/012/DPJP/' . date('Y'),
                         'diagnosis' => $diagnosisText,
+                        'icd10_code' => $validated['icd10_code'] ?? null,
                         'symptoms' => $validated['symptoms'] ?? $queue->complaint,
+                        'allergies_checked' => $validated['allergies_checked'] ?? ($queue->user->allergies ?? 'Tidak ada riwayat alergi'),
                         'blood_pressure' => $validated['blood_pressure'] ?? null,
+                        'heart_rate' => $validated['heart_rate'] ?? null,
+                        'respiratory_rate' => $validated['respiratory_rate'] ?? null,
                         'temperature' => $validated['temperature'] ?? null,
                         'weight' => $validated['weight'] ?? null,
+                        'height' => $validated['height'] ?? null,
+                        'physical_exam' => $validated['physical_exam'] ?? null,
                         'treatment_notes' => $treatmentNotes,
+                        'follow_up_advice' => $validated['follow_up_advice'] ?? null,
                     ]);
 
                     // Proses pengurangan stok obat dan simpan item resep

@@ -27,6 +27,9 @@ class User extends Authenticatable
         'birthDate',
         'address',
         'phoneNumber',
+        'medical_record_number',
+        'allergies',
+        'blood_type',
         'role',
     ];
 
@@ -67,6 +70,28 @@ class User extends Authenticatable
         return $this->role === self::ROLE_STUDENT;
     }
 
+    /**
+     * Nama Tampilan Bersih (tanpa kurung peran tambahan di navbar)
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        $clean = preg_replace('/\s*\(.*?\)\s*/', '', $this->name);
+        return trim($clean) ?: $this->name;
+    }
+
+    /**
+     * Label Singkat Peran untuk Badge Navbar
+     */
+    public function getRoleBadgeLabelAttribute(): string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN => 'Petugas Medis',
+            self::ROLE_STAFF => 'Dosen / Staf',
+            self::ROLE_STUDENT => 'Mahasiswa',
+            default => 'Pengguna',
+        };
+    }
+
     public function getRoleLabelAttribute(): string
     {
         return match ($this->role) {
@@ -75,5 +100,13 @@ class User extends Authenticatable
             self::ROLE_STUDENT => 'Mahasiswa Polinema',
             default => 'Pengguna',
         };
+    }
+
+    /**
+     * Nomor Rekam Medis (No. RM) Permanen Pasien
+     */
+    public function getFormattedMedicalRecordNumberAttribute(): string
+    {
+        return $this->medical_record_number ?: ('RM-' . date('y') . '-' . str_pad((string) $this->id, 4, '0', STR_PAD_LEFT));
     }
 }

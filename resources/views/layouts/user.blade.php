@@ -30,11 +30,11 @@
                         <i class="bi bi-person-circle me-1"></i> Portal Pasien Terpadu
                     </span>
                     <h2 class="fw-bold mb-1">Selamat Datang, {{ $user->name }}</h2>
-                    <p class="text-secondary small mb-0">
-                        <span class="me-3"><i class="bi bi-card-heading text-primary me-1"></i> NIM/NIP: <strong class="mono-num text-dark">{{ $user->noId }}</strong></span>
-                        <span class="me-3"><i class="bi bi-envelope text-primary me-1"></i> {{ $user->email }}</span>
-                        <span><i class="bi bi-award-fill text-warning me-1"></i> {{ $user->role_label }}</span>
-                    </p>
+                    <div class="d-flex flex-wrap align-items-center gap-3 text-secondary small mt-2">
+                        <span><i class="bi bi-file-medical text-primary me-1"></i> No. RM: <strong class="mono-num text-dark">{{ $user->formatted_medical_record_number }}</strong></span>
+                        <span><i class="bi bi-card-heading text-primary me-1"></i> NIM/NIP: <strong class="mono-num text-dark">{{ $user->noId }}</strong></span>
+                        <span><i class="bi bi-shield-check text-success me-1"></i> Alergi: <strong class="{{ $user->allergies && $user->allergies !== 'Tidak ada riwayat alergi obat' ? 'text-danger' : 'text-dark' }}">{{ $user->allergies ?? 'Tidak ada riwayat alergi' }}</strong></span>
+                    </div>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <div class="badge bg-light text-dark border p-2 text-start shadow-xs">
@@ -293,8 +293,13 @@
                             <div class="row g-3">
                                 <div class="col-md-7">
                                     <div class="mb-2">
-                                        <small class="text-muted d-block fw-semibold" style="font-size: 0.75rem;">DIAGNOSIS KLINIS:</small>
-                                        <div class="fw-bold text-dark fs-6">{{ $record->diagnosis }}</div>
+                                        <small class="text-muted d-block fw-semibold" style="font-size: 0.75rem;">DIAGNOSIS KLINIS (ICD-10):</small>
+                                        <div class="fw-bold text-dark fs-6">
+                                            @if ($record->icd10_code)
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1 mono-num">{{ $record->icd10_code }}</span>
+                                            @endif
+                                            {{ $record->diagnosis }}
+                                        </div>
                                     </div>
                                     @if ($record->symptoms)
                                         <div class="mb-2">
@@ -309,26 +314,34 @@
                                         </div>
                                     @endif
 
-                                    {{-- Vital Signs Badges --}}
-                                    @if ($record->blood_pressure || $record->temperature || $record->weight)
-                                        <div class="d-flex flex-wrap gap-2 mt-2 pt-1">
-                                            @if ($record->blood_pressure)
-                                                <span class="badge bg-white text-dark border">
-                                                    <i class="bi bi-heart-pulse text-danger me-1"></i> Tensi: {{ $record->blood_pressure }} mmHg
-                                                </span>
-                                            @endif
-                                            @if ($record->temperature)
-                                                <span class="badge bg-white text-dark border">
-                                                    <i class="bi bi-thermometer-half text-warning me-1"></i> Suhu: {{ $record->temperature }} &deg;C
-                                                </span>
-                                            @endif
-                                            @if ($record->weight)
-                                                <span class="badge bg-white text-dark border">
-                                                    <i class="bi bi-speedometer text-info me-1"></i> BB: {{ $record->weight }} kg
-                                                </span>
-                                            @endif
-                                        </div>
-                                    @endif
+                                    {{-- Vital Signs Badges (TTV Standar) --}}
+                                    <div class="d-flex flex-wrap gap-2 mt-2 pt-1">
+                                        @if ($record->blood_pressure)
+                                            <span class="badge bg-white text-dark border">
+                                                <i class="bi bi-heart-pulse text-danger me-1"></i> Tensi: {{ $record->blood_pressure }} mmHg
+                                            </span>
+                                        @endif
+                                        @if ($record->heart_rate)
+                                            <span class="badge bg-white text-dark border">
+                                                <i class="bi bi-activity text-primary me-1"></i> Nadi: {{ $record->heart_rate }} bpm
+                                            </span>
+                                        @endif
+                                        @if ($record->temperature)
+                                            <span class="badge bg-white text-dark border">
+                                                <i class="bi bi-thermometer-half text-warning me-1"></i> Suhu: {{ $record->temperature }} &deg;C
+                                            </span>
+                                        @endif
+                                        @if ($record->respiratory_rate)
+                                            <span class="badge bg-white text-dark border">
+                                                <i class="bi bi-lungs text-info me-1"></i> Nafas: {{ $record->respiratory_rate }} x/m
+                                            </span>
+                                        @endif
+                                        @if ($record->weight)
+                                            <span class="badge bg-white text-dark border">
+                                                <i class="bi bi-speedometer text-secondary me-1"></i> BB: {{ $record->weight }} kg
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="col-md-5">

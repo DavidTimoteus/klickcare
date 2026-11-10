@@ -24,6 +24,9 @@ class UserSeeder extends Seeder
                 'birthDate' => '1985-01-01',
                 'address' => 'Jl. Soekarno Hatta No. 9, Malang',
                 'phoneNumber' => '081234567890',
+                'medical_record_number' => 'RM-MED-0001',
+                'allergies' => 'Tidak ada riwayat alergi obat',
+                'blood_type' => 'O',
                 'role' => User::ROLE_ADMIN,
                 'email_verified_at' => now(),
             ]
@@ -40,6 +43,9 @@ class UserSeeder extends Seeder
                 'birthDate' => '1975-05-05',
                 'address' => 'Perumahan Dosen Polinema Blok B-12, Malang',
                 'phoneNumber' => '081234567891',
+                'medical_record_number' => 'RM-POL-0002',
+                'allergies' => 'Tidak ada riwayat alergi obat',
+                'blood_type' => 'A',
                 'role' => User::ROLE_STAFF,
                 'email_verified_at' => now(),
             ]
@@ -56,6 +62,9 @@ class UserSeeder extends Seeder
                 'birthDate' => '2002-12-17',
                 'address' => 'Jl. Kembang Turi No. 15, Lowokwaru, Malang',
                 'phoneNumber' => '085712345678',
+                'medical_record_number' => 'RM-POL-0003',
+                'allergies' => 'Alergi Golongan Penisilin (Amoxicillin)',
+                'blood_type' => 'B',
                 'role' => User::ROLE_STUDENT,
                 'email_verified_at' => now(),
             ]
