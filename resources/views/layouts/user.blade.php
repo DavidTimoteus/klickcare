@@ -188,12 +188,124 @@
             </div>
         </div>
 
+        {{-- Rekam Medis Elektronik (RME) & Resep Obat Pasien --}}
+        <div class="bg-white border rounded-4 p-4 shadow-sm mb-4">
+            <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-1">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Rekam Medis Terverifikasi & Terenkripsi
+                    </span>
+                    <h5 class="fw-bold mb-1">Catatan Rekam Medis & Resep Obat Elektronik</h5>
+                    <p class="text-secondary small mb-0">Arsip riwayat diagnosa dokter, tanda vital klinis, dan detail resep obat yang telah diresepkan.</p>
+                </div>
+            </div>
+
+            @if ($medicalRecords->count() > 0)
+                <div class="d-flex flex-column gap-3">
+                    @foreach ($medicalRecords as $record)
+                        <div class="border rounded-3 p-3 bg-light hover-elevate transition-all">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2 mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary text-white mono-num">{{ $record->record_code }}</span>
+                                    <span class="fw-bold text-dark">{{ $record->poli->name }}</span>
+                                    <small class="text-muted">&bull; {{ $record->doctor_name }}</small>
+                                </div>
+                                <div class="small text-muted">
+                                    <i class="bi bi-calendar3 me-1 text-primary"></i> {{ $record->created_at->translatedFormat('d F Y, H:i') }} WIB
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <div class="mb-2">
+                                        <small class="text-muted d-block fw-semibold" style="font-size: 0.75rem;">DIAGNOSIS KLINIS:</small>
+                                        <div class="fw-bold text-dark fs-6">{{ $record->diagnosis }}</div>
+                                    </div>
+                                    @if ($record->symptoms)
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block fw-semibold" style="font-size: 0.75rem;">GEJALA & ANAMNESIS:</small>
+                                            <span class="small text-secondary">{{ $record->symptoms }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($record->treatment_notes)
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block fw-semibold" style="font-size: 0.75rem;">ANJURAN & CATATAN DOKTER:</small>
+                                            <span class="small text-secondary">{{ $record->treatment_notes }}</span>
+                                        </div>
+                                    @endif
+
+                                    {{-- Vital Signs Badges --}}
+                                    @if ($record->blood_pressure || $record->temperature || $record->weight)
+                                        <div class="d-flex flex-wrap gap-2 mt-2 pt-1">
+                                            @if ($record->blood_pressure)
+                                                <span class="badge bg-white text-dark border">
+                                                    <i class="bi bi-heart-pulse text-danger me-1"></i> Tensi: {{ $record->blood_pressure }} mmHg
+                                                </span>
+                                            @endif
+                                            @if ($record->temperature)
+                                                <span class="badge bg-white text-dark border">
+                                                    <i class="bi bi-thermometer-half text-warning me-1"></i> Suhu: {{ $record->temperature }} &deg;C
+                                                </span>
+                                            @endif
+                                            @if ($record->weight)
+                                                <span class="badge bg-white text-dark border">
+                                                    <i class="bi bi-speedometer text-info me-1"></i> BB: {{ $record->weight }} kg
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="col-md-5">
+                                    <div class="bg-white border rounded-3 p-3 h-100">
+                                        <small class="text-primary d-block fw-bold mb-2">
+                                            <i class="bi bi-capsule me-1"></i> Resep Obat Farmasi Poliklinik:
+                                        </small>
+                                        @if ($record->prescriptions->count() > 0)
+                                            <ul class="list-unstyled mb-0 small">
+                                                @foreach ($record->prescriptions as $item)
+                                                    <li class="d-flex justify-content-between align-items-start py-1 border-bottom last-border-0">
+                                                        <div>
+                                                            <span class="fw-bold text-dark">{{ $item->medicine->name }}</span>
+                                                            <div class="text-muted" style="font-size: 0.75rem;">
+                                                                <i class="bi bi-clock me-1"></i>{{ $item->dosage }}
+                                                            </div>
+                                                        </div>
+                                                        <span class="badge bg-light text-dark border mono-num ms-2">
+                                                            {{ $item->quantity }} {{ $item->medicine->unit }}
+                                                        </span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <p class="small text-muted mb-0 fst-italic">Tidak ada resep obat (tindakan non-farmakologi atau anjuran observasi mandiri).</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                @if ($medicalRecords->hasPages())
+                    <div class="d-flex justify-content-end mt-3">
+                        {{ $medicalRecords->links() }}
+                    </div>
+                @endif
+            @else
+                <div class="text-center py-4 text-muted small">
+                    <i class="bi bi-file-earmark-medical fs-2 text-secondary d-block mb-2"></i>
+                    Belum ada rekam medis terbit. Rekam medis akan otomatis tampil setelah dokter menyelesaikan pemeriksaan kunjungan Anda.
+                </div>
+            @endif
+        </div>
+
         {{-- Riwayat Kunjungan Pasien --}}
         <div class="bg-white border rounded-4 p-4 shadow-sm">
             <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
                 <div>
-                    <h5 class="fw-bold mb-1">Riwayat Pemeriksaan Medis Anda</h5>
-                    <p class="text-secondary small mb-0">Catatan kunjungan medis, status diagnosa, dan resep dokter terdahulu.</p>
+                    <h5 class="fw-bold mb-1">Riwayat Tiket Antrian Kunjungan</h5>
+                    <p class="text-secondary small mb-0">Catatan nomor tiket antrian kunjungan ke Poliklinik Polinema.</p>
                 </div>
             </div>
 

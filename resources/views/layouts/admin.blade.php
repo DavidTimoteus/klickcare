@@ -27,10 +27,18 @@
                         Kelola antrian pasien, panggil nomor antrian ke ruang periksa, serta catat diagnosis dan resep obat secara terintegrasi.
                     </p>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="badge bg-light text-dark border p-2 text-start">
-                        <small class="text-muted d-block">Tanggal Pelayanan:</small>
-                        <span class="fw-bold"><i class="bi bi-calendar-check text-primary me-1"></i> {{ now()->translatedFormat('l, d F Y') }}</span>
+                <div class="col-md-5 text-md-end">
+                    <div class="d-flex flex-wrap justify-content-md-end align-items-center gap-2 mb-2">
+                        <a href="{{ route('admin.pharmacy') }}" class="btn btn-outline-primary btn-sm rounded-3 fw-semibold position-relative">
+                            <i class="bi bi-capsule me-1"></i> Stok Farmasi
+                            @if ($lowStockCount > 0)
+                                <span class="badge bg-danger ms-1">{{ $lowStockCount }} menipis</span>
+                            @endif
+                        </a>
+                        <div class="badge bg-light text-dark border p-2 text-start">
+                            <small class="text-muted d-block">Tanggal Pelayanan:</small>
+                            <span class="fw-bold"><i class="bi bi-calendar-check text-primary me-1"></i> {{ now()->translatedFormat('l, d F Y') }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -196,38 +204,168 @@
                                         @endif
                                     </div>
 
-                                    {{-- Modal Catat Rekam Medis / Resep --}}
+                                    {{-- Modal Catat Rekam Medis & Resep Farmasi --}}
                                     @if ($q->status === 'in_progress')
                                         <div class="modal fade" id="completeModal{{ $q->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $q->id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <form action="{{ route('admin.queue.status', $q->id) }}" method="POST">
                                                         @csrf
                                                         <input type="hidden" name="status" value="completed">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title fw-bold" id="modalLabel{{ $q->id }}">
-                                                                Selesaikan Pemeriksaan {{ $q->queue_code }}
-                                                            </h5>
+                                                            <div>
+                                                                <h5 class="modal-title fw-bold mb-0" id="modalLabel{{ $q->id }}">
+                                                                    <i class="bi bi-file-earmark-medical text-primary me-2"></i>Rekam Medis & Peresepan Pasien {{ $q->queue_code }}
+                                                                </h5>
+                                                                <small class="text-muted">{{ $q->user->name }} ({{ $q->user->noId }}) &bull; {{ $q->poli->name }}</small>
+                                                            </div>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body text-start">
-                                                            <div class="mb-3">
-                                                                <label class="form-label small fw-bold">Nama Pasien:</label>
-                                                                <input type="text" class="form-control" value="{{ $q->user->name }} ({{ $q->user->noId }})" readonly disabled>
+                                                            {{-- Patient Info & Complaint Summary --}}
+                                                            <div class="p-3 bg-light rounded-3 border mb-3">
+                                                                <div class="small fw-bold text-muted mb-1">Keluhan Pasien saat Pendaftaran:</div>
+                                                                <p class="small text-dark mb-0 fw-medium">{{ $q->complaint }}</p>
                                                             </div>
+
+                                                            {{-- Vital Signs (Tanda Vital) --}}
                                                             <div class="mb-3">
-                                                                <label class="form-label small fw-bold">Keluhan Pasien:</label>
-                                                                <p class="small text-muted p-2 bg-light border rounded">{{ $q->complaint }}</p>
+                                                                <label class="form-label small fw-bold text-secondary mb-1">
+                                                                    <i class="bi bi-activity text-danger me-1"></i> Pemeriksaan Tanda-Tanda Vital
+                                                                </label>
+                                                                <div class="row g-2">
+                                                                    <div class="col-md-4">
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span class="input-group-text bg-white text-muted">Tensi</span>
+                                                                            <input type="text" name="blood_pressure" class="form-control" placeholder="Contoh: 120/80">
+                                                                            <span class="input-group-text bg-white text-muted">mmHg</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span class="input-group-text bg-white text-muted">Suhu</span>
+                                                                            <input type="text" name="temperature" class="form-control" placeholder="Contoh: 36.5">
+                                                                            <span class="input-group-text bg-white text-muted">&deg;C</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span class="input-group-text bg-white text-muted">BB</span>
+                                                                            <input type="text" name="weight" class="form-control" placeholder="Contoh: 60">
+                                                                            <span class="input-group-text bg-white text-muted">kg</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <label for="doctor_notes_{{ $q->id }}" class="form-label small fw-bold">Diagnosis Medis & Resep Obat:</label>
-                                                                <textarea class="form-control" id="doctor_notes_{{ $q->id }}" name="doctor_notes" rows="3" 
-                                                                          placeholder="Tuliskan hasil diagnosis, tindakan medis, atau resep obat yang diberikan..." required></textarea>
+
+                                                            {{-- Diagnosis & Anamnesis --}}
+                                                            <div class="row g-2 mb-3">
+                                                                <div class="col-md-7">
+                                                                    <label for="diagnosis_{{ $q->id }}" class="form-label small fw-bold">
+                                                                        Diagnosis Medis <span class="text-danger">*</span>
+                                                                    </label>
+                                                                    <input type="text" class="form-control form-control-sm" id="diagnosis_{{ $q->id }}" name="diagnosis" 
+                                                                           placeholder="Contoh: ISPA / Pharyngitis Akut / Cephalea Tension" required>
+                                                                </div>
+                                                                <div class="col-md-5">
+                                                                    <label for="symptoms_{{ $q->id }}" class="form-label small fw-bold">
+                                                                        Gejala / Anamnesis Tambahan
+                                                                    </label>
+                                                                    <input type="text" class="form-control form-control-sm" id="symptoms_{{ $q->id }}" name="symptoms" 
+                                                                           placeholder="Contoh: Demam 2 hari, batuk kering">
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Resep Obat & Penurunan Stok Otomatis --}}
+                                                            <div class="border rounded-3 p-3 bg-light mb-3">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <label class="form-label small fw-bold mb-0 text-primary">
+                                                                        <i class="bi bi-capsule me-1"></i> Resep Obat & Pemotongan Stok Farmasi Otomatis
+                                                                    </label>
+                                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.7rem;">
+                                                                        Stok dipotong langsung
+                                                                    </span>
+                                                                </div>
+                                                                <p class="text-muted small mb-2" style="font-size: 0.775rem;">
+                                                                    Pilih obat yang diresepkan untuk pasien. Sistem akan memvalidasi ketersediaan dan mengurangi stok farmasi secara atomik.
+                                                                </p>
+
+                                                                {{-- Prescription Item Row 1 --}}
+                                                                <div class="row g-2 align-items-center mb-2">
+                                                                    <div class="col-md-5">
+                                                                        <select name="medicines[0][id]" class="form-select form-select-sm">
+                                                                            <option value="">-- Pilih Obat 1 (Opsional) --</option>
+                                                                            @foreach ($medicines as $med)
+                                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <input type="number" name="medicines[0][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                                    </div>
+                                                                    <div class="col-md-5">
+                                                                        <input type="text" name="medicines[0][dosage]" class="form-control form-control-sm" placeholder="Aturan: misal 3x1 tablet sesudah makan">
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Prescription Item Row 2 --}}
+                                                                <div class="row g-2 align-items-center mb-2">
+                                                                    <div class="col-md-5">
+                                                                        <select name="medicines[1][id]" class="form-select form-select-sm">
+                                                                            <option value="">-- Pilih Obat 2 (Opsional) --</option>
+                                                                            @foreach ($medicines as $med)
+                                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <input type="number" name="medicines[1][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                                    </div>
+                                                                    <div class="col-md-5">
+                                                                        <input type="text" name="medicines[1][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / instruksi minum">
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Prescription Item Row 3 --}}
+                                                                <div class="row g-2 align-items-center">
+                                                                    <div class="col-md-5">
+                                                                        <select name="medicines[2][id]" class="form-select form-select-sm">
+                                                                            <option value="">-- Pilih Obat 3 (Opsional) --</option>
+                                                                            @foreach ($medicines as $med)
+                                                                                <option value="{{ $med->id }}" {{ $med->isOutOfStock() ? 'disabled' : '' }}>
+                                                                                    {{ $med->name }} (Sisa: {{ $med->stock }} {{ $med->unit }}) {{ $med->isOutOfStock() ? '[HABIS]' : '' }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <input type="number" name="medicines[2][quantity]" class="form-control form-control-sm" min="1" placeholder="Jumlah">
+                                                                    </div>
+                                                                    <div class="col-md-5">
+                                                                        <input type="text" name="medicines[2][dosage]" class="form-control form-control-sm" placeholder="Aturan pakai / instruksi minum">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Catatan / Tindakan Medis --}}
+                                                            <div class="mb-2">
+                                                                <label for="doctor_notes_{{ $q->id }}" class="form-label small fw-bold">
+                                                                    Catatan Tindakan Medis / Edukasi Pasien:
+                                                                </label>
+                                                                <textarea class="form-control" id="doctor_notes_{{ $q->id }}" name="doctor_notes" rows="2" 
+                                                                          placeholder="Instruksi istirahat, anjuran kontrol lanjutan, atau catatan edukasi pasien..."></textarea>
+                                                                <small class="text-muted">Akan dienkripsi secara aman dan tercatat di lembar rekam medis pasien.</small>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-                                                            <button type="submit" class="btn btn-success btn-sm fw-bold">Simpan & Selesaikan</button>
+                                                            <button type="submit" class="btn btn-success btn-sm fw-bold">
+                                                                <i class="bi bi-check2-circle me-1"></i> Simpan Rekam Medis & Selesaikan
+                                                            </button>
                                                         </div>
                                                     </form>
                                                 </div>

@@ -47,6 +47,11 @@ class User extends Authenticatable
         return $this->hasMany(Queue::class, 'user_id');
     }
 
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecord::class, 'user_id');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;

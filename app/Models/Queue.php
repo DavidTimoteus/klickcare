@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Queue extends Model
 {
@@ -38,6 +39,11 @@ class Queue extends Model
     public function poli(): BelongsTo
     {
         return $this->belongsTo(Poli::class, 'poli_id');
+    }
+
+    public function medicalRecord(): HasOne
+    {
+        return $this->hasOne(MedicalRecord::class, 'queue_id');
     }
 
     public function getStatusLabelAttribute(): string

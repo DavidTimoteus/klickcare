@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedicalRecord;
+use App\Models\Medicine;
 use App\Models\Poli;
+use App\Models\PrescriptionItem;
 use App\Models\Queue;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -145,7 +148,20 @@ class DashboardController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('layouts.user', compact('user', 'polies', 'activeQueue', 'waitingAheadCount', 'historyQueues'));
+        // Riwayat rekam medis terstruktur & resep obat pasien
+        $medicalRecords = MedicalRecord::with(['poli', 'prescriptions.medicine'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->paginate(5);
+
+        return view('layouts.user', compact(
+            'user', 
+            'polies', 
+            'activeQueue', 
+            'waitingAheadCount', 
+            'historyQueues', 
+            'medicalRecords'
+        ));
     }
 
     /**
@@ -284,6 +300,10 @@ class DashboardController extends Controller
             ->take(8)
             ->get();
 
+        // Stok obat aktif untuk modal peresepan medis dokter
+        $medicines = Medicine::where('is_active', true)->orderBy('name')->get();
+        $lowStockCount = Medicine::where('is_active', true)->whereColumn('stock', '<=', 'min_stock')->count();
+
         return view('layouts.admin', compact(
             'polies',
             'todayQueues',
@@ -291,19 +311,30 @@ class DashboardController extends Controller
             'inProgressCount',
             'completedCount',
             'totalPatientsCount',
-            'selectedPoliId'
+            'selectedPoliId',
+            'medicines',
+            'lowStockCount'
         ));
     }
 
     /**
-     * Update Status Antrian & Catatan Dokter oleh Admin/Petugas Medis
-     * Menegakkan aturan: 1 pasien aktif per poli & alur Lewati (Skipped)
+     * Update Status Antrian, Rekam Medis & Pengurangan Stok Resep Obat (Atomic)
+     * Menegakkan aturan: 1 pasien aktif per poli, alur Lewati (Skipped), dan pengurangan stok otomatis
      */
     public function updateQueueStatus(Request $request, Queue $queue): RedirectResponse
     {
         $validated = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,skipped,completed,cancelled'],
             'doctor_notes' => ['nullable', 'string', 'max:1000'],
+            'diagnosis' => ['nullable', 'string', 'max:500'],
+            'symptoms' => ['nullable', 'string', 'max:500'],
+            'blood_pressure' => ['nullable', 'string', 'max:20'],
+            'temperature' => ['nullable', 'string', 'max:10'],
+            'weight' => ['nullable', 'string', 'max:10'],
+            'medicines' => ['nullable', 'array'],
+            'medicines.*.id' => ['required_with:medicines', 'exists:tbl_medicines,id'],
+            'medicines.*.quantity' => ['required_with:medicines', 'integer', 'min:1'],
+            'medicines.*.dosage' => ['required_with:medicines', 'string', 'max:100'],
         ]);
 
         // Aturan Integritas Medis: Hanya boleh ada 1 pasien berstatus in_progress per poli pada tanggal kunjungan
@@ -321,20 +352,170 @@ class DashboardController extends Controller
             }
         }
 
-        $queue->status = $validated['status'];
-        if (isset($validated['doctor_notes'])) {
-            $queue->doctor_notes = $validated['doctor_notes'];
+        try {
+            DB::transaction(function () use ($validated, $queue) {
+                $queue->status = $validated['status'];
+
+                // Jika pemeriksaan selesai, buat Rekam Medis terstruktur & kurangi stok obat secara atomik
+                if ($validated['status'] === 'completed') {
+                    $diagnosisText = $validated['diagnosis'] ?? ($validated['doctor_notes'] ?? 'Pemeriksaan Klinis Rutin');
+                    $treatmentNotes = $validated['doctor_notes'] ?? null;
+
+                    // Buat nomor rekam medis unik e.g. RM-202611-0001
+                    $recordCount = MedicalRecord::count() + 1;
+                    $recordCode = 'RM-' . date('Ym') . '-' . str_pad((string) $recordCount, 4, '0', STR_PAD_LEFT);
+
+                    $medicalRecord = MedicalRecord::create([
+                        'record_code' => $recordCode,
+                        'queue_id' => $queue->id,
+                        'user_id' => $queue->user_id,
+                        'poli_id' => $queue->poli_id,
+                        'doctor_name' => $queue->poli->doctor_name,
+                        'diagnosis' => $diagnosisText,
+                        'symptoms' => $validated['symptoms'] ?? $queue->complaint,
+                        'blood_pressure' => $validated['blood_pressure'] ?? null,
+                        'temperature' => $validated['temperature'] ?? null,
+                        'weight' => $validated['weight'] ?? null,
+                        'treatment_notes' => $treatmentNotes,
+                    ]);
+
+                    // Proses pengurangan stok obat dan simpan item resep
+                    $prescribedMedicineNames = [];
+                    if (!empty($validated['medicines'])) {
+                        foreach ($validated['medicines'] as $medItem) {
+                            if (empty($medItem['id']) || empty($medItem['quantity'])) continue;
+
+                            $medicine = Medicine::where('id', $medItem['id'])->lockForUpdate()->firstOrFail();
+
+                            if ($medicine->stock < (int) $medItem['quantity']) {
+                                throw new \RuntimeException("Stok obat {$medicine->name} tidak mencukupi (tersisa: {$medicine->stock} {$medicine->unit}).");
+                            }
+
+                            $medicine->decrement('stock', (int) $medItem['quantity']);
+
+                            PrescriptionItem::create([
+                                'medical_record_id' => $medicalRecord->id,
+                                'medicine_id' => $medicine->id,
+                                'quantity' => (int) $medItem['quantity'],
+                                'dosage' => $medItem['dosage'] ?? 'Sesuai petunjuk dokter',
+                            ]);
+
+                            $prescribedMedicineNames[] = "{$medicine->name} ({$medItem['quantity']} {$medicine->unit})";
+                        }
+                    }
+
+                    // Susun ringkasan catatan dokter
+                    $summaryNotes = "Diagnosa: {$diagnosisText}";
+                    if (!empty($prescribedMedicineNames)) {
+                        $summaryNotes .= " | Resep: " . implode(', ', $prescribedMedicineNames);
+                    }
+                    if ($treatmentNotes && $treatmentNotes !== $diagnosisText) {
+                        $summaryNotes .= " | Catatan: {$treatmentNotes}";
+                    }
+                    $queue->doctor_notes = $summaryNotes;
+                } elseif (isset($validated['doctor_notes'])) {
+                    $queue->doctor_notes = $validated['doctor_notes'];
+                }
+
+                $queue->save();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['queue' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            return back()->withErrors(['queue' => 'Gagal memperbarui status pemeriksaan. ' . $e->getMessage()]);
         }
-        $queue->save();
 
         $statusMsg = match ($validated['status']) {
             'in_progress' => "Pasien {$queue->user->name} ({$queue->queue_code}) sedang dipanggil ke ruang periksa.",
             'skipped' => "Pasien {$queue->user->name} ({$queue->queue_code}) telah dilewati dan dapat dipanggil ulang nanti.",
-            'completed' => "Pemeriksaan pasien {$queue->user->name} ({$queue->queue_code}) telah selesai dicatat.",
+            'completed' => "Pemeriksaan pasien {$queue->user->name} ({$queue->queue_code}) telah selesai. Rekam medis & pemotongan stok obat berhasil dicatat.",
             'cancelled' => "Antrian {$queue->queue_code} telah dibatalkan.",
             default => "Status antrian {$queue->queue_code} berhasil diperbarui.",
         };
 
         return back()->with('success', $statusMsg);
+    }
+
+    /**
+     * Manajemen Farmasi & Stok Obat Poliklinik (Admin Medis)
+     */
+    public function pharmacyIndex(Request $request): View
+    {
+        $search = $request->query('q');
+        $selectedCategory = $request->query('category');
+
+        $query = Medicine::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($selectedCategory) {
+            $query->where('category', $selectedCategory);
+        }
+
+        $medicines = $query->orderBy('name')->paginate(12);
+
+        $categories = Medicine::distinct()->pluck('category');
+        $totalMedicinesCount = Medicine::count();
+        $lowStockCount = Medicine::where('is_active', true)->whereColumn('stock', '<=', 'min_stock')->count();
+        $outOfStockCount = Medicine::where('is_active', true)->where('stock', '<=', 0)->count();
+
+        return view('admin.pharmacy', compact(
+            'medicines',
+            'categories',
+            'totalMedicinesCount',
+            'lowStockCount',
+            'outOfStockCount',
+            'search',
+            'selectedCategory'
+        ));
+    }
+
+    /**
+     * Tambah Stok Obat yang Ada
+     */
+    public function updateMedicineStock(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'medicine_id' => ['required', 'exists:tbl_medicines,id'],
+            'additional_stock' => ['required', 'integer', 'min:1', 'max:10000'],
+        ], [
+            'additional_stock.min' => 'Jumlah penambahan stok minimal 1 unit.',
+        ]);
+
+        $medicine = Medicine::findOrFail($validated['medicine_id']);
+        $medicine->increment('stock', $validated['additional_stock']);
+
+        return back()->with('success', "Stok obat {$medicine->name} berhasil ditambah sebanyak {$validated['additional_stock']} {$medicine->unit}. Total stok saat ini: {$medicine->stock} {$medicine->unit}.");
+    }
+
+    /**
+     * Tambah Data Obat Baru ke Katalog Farmasi
+     */
+    public function storeMedicine(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:20', 'unique:tbl_medicines,code'],
+            'name' => ['required', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:50'],
+            'unit' => ['required', 'string', 'max:30'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'min_stock' => ['required', 'integer', 'min:1'],
+            'description' => ['nullable', 'string', 'max:500'],
+        ], [
+            'code.unique' => 'Kode obat sudah digunakan dalam katalog.',
+            'name.required' => 'Nama obat wajib diisi.',
+            'category.required' => 'Kategori obat wajib diisi.',
+            'unit.required' => 'Satuan obat wajib diisi.',
+        ]);
+
+        $medicine = Medicine::create($validated);
+
+        return back()->with('success', "Obat {$medicine->name} ({$medicine->code}) berhasil didaftarkan ke katalog farmasi.");
     }
 }

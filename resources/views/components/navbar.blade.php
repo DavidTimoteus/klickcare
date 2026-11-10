@@ -33,8 +33,13 @@
                 @auth
                     @if (Auth::user()->isAdmin())
                         <li class="nav-item">
-                            <a class="kc-nav-link {{ request()->routeIs('admin*') ? 'active' : '' }}" href="{{ route('admin') }}">
-                                <i class="bi bi-speedometer2 me-1"></i> Konsol Medis Admin
+                            <a class="kc-nav-link {{ request()->routeIs('admin') ? 'active' : '' }}" href="{{ route('admin') }}">
+                                <i class="bi bi-speedometer2 me-1"></i> Konsol Medis
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="kc-nav-link {{ request()->routeIs('admin.pharmacy*') ? 'active' : '' }}" href="{{ route('admin.pharmacy') }}">
+                                <i class="bi bi-capsule me-1"></i> Stok Farmasi
                             </a>
                         </li>
                     @else

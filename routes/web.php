@@ -37,4 +37,7 @@ Route::middleware(['auth', 'role:2,3'])->group(function () {
 Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('/Admin-Dashboard', [DashboardController::class, 'adminDashboard'])->name('admin');
     Route::post('/admin/antrian/{queue}/status', [DashboardController::class, 'updateQueueStatus'])->name('admin.queue.status');
+    Route::get('/admin/farmasi', [DashboardController::class, 'pharmacyIndex'])->name('admin.pharmacy');
+    Route::post('/admin/farmasi/stok', [DashboardController::class, 'updateMedicineStock'])->name('admin.pharmacy.stock');
+    Route::post('/admin/farmasi/obat', [DashboardController::class, 'storeMedicine'])->name('admin.pharmacy.store');
 });
